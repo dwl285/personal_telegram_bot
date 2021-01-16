@@ -1,5 +1,5 @@
-const currentEnvironment = "TEST";
-// const currentEnvironment = "PROD";
+// const currentEnvironment = "TEST";
+const currentEnvironment = "PROD";
 
 const testChatID = -417576688;
 const prodChatID = -484842241;
