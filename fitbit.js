@@ -62,7 +62,18 @@ const refreshTokens = () => {
   refreshToken("Dan");
 }
 
-const getSleepDataForDateRange = (name = "Dan", start_date = "2021-01-01", end_date = "2021-01-11") => {
+const dateRangeUrls = {
+  sleep: "https://api.fitbit.com/1.2/user/-/sleep/date",
+  heart: "https://api.fitbit.com/1/user/-/activities/heart/date"
+};
+
+const getDataForDateRange = (
+  type = "sleep",
+  name = "Dan",
+  start_date = "2021-01-01",
+  end_date = "2021-01-11",
+) => {
+
   // refresh tokens
   refreshTokens();
 
@@ -75,40 +86,73 @@ const getSleepDataForDateRange = (name = "Dan", start_date = "2021-01-01", end_d
     "method": "GET",
     "headers": headers
   };
-
-  const sleepUrl = `https://api.fitbit.com/1.2/user/-/sleep/date/${start_date}/${end_date}.json`;
-  const response = UrlFetchApp.fetch(sleepUrl, params);
+  const url = `${dateRangeUrls[type]}/${start_date}/${end_date}.json`;
+  const response = UrlFetchApp.fetch(url, params);
   const data = JSON.parse(response);
   return (data);
 }
 
+/* SLEEP */
+
 const lastNDaysAverageSleep = (name = "Dan", n = 28) => {
   const millis_in_day = 1000 * 60 * 60 * 24;
   const yesterday = new Date();
-  yesterday.setTime(yesterday.getTime()-(millis_in_day));
+  yesterday.setTime(yesterday.getTime() - (millis_in_day));
   const start_date = new Date()
-  start_date.setTime(yesterday.getTime()-((n-1)*millis_in_day));
+  start_date.setTime(yesterday.getTime() - ((n - 1) * millis_in_day));
   const yesterday_string = Utilities.formatDate(yesterday, 'Europe/London', 'yyyy-MM-dd');
   const start_date_string = Utilities.formatDate(start_date, 'Europe/London', 'yyyy-MM-dd');
-  const sleep_data = getSleepDataForDateRange(name, start_date_string, yesterday_string);
+  const sleep_data = getDataForDateRange("sleep", name, start_date_string, yesterday_string);
   const total_mins_asleep = sleep_data.sleep.map(r => r.minutesAsleep).reduce((a, b) => (a + b));
   const days_with_data = new Set(sleep_data.sleep.map(r => r.dateOfSleep)).size;
   const average_mins_of_sleep = total_mins_asleep / days_with_data;
   const hours = Math.floor(average_mins_of_sleep / 60);
   const minutes = Math.floor(average_mins_of_sleep - 60 * hours);
-  return({
+  return ({
     average_mins_of_sleep: average_mins_of_sleep,
     time_asleep_string: `${hours} hrs ${minutes} mins`,
     days_with_data: days_with_data
   });
 }
 
-const dailyFitbitMessage = () => {
-  return(
+const dailyFitbitSleepMessage = () => {
+  return (
     [`*Sleep*`,
       `Last 7 days: ${lastNDaysAverageSleep("Dan", 7).time_asleep_string}`,
       `Last 28 days: ${lastNDaysAverageSleep("Dan", 28).time_asleep_string}`,
       `Last 90 days: ${lastNDaysAverageSleep("Dan", 90).time_asleep_string}`]
+      .join(`\n`)
+  );
+}
+
+/* RESTING HEART RATE */
+
+const lastNDaysAverageHeartrate = (name = "Dan", n = 90) => {
+  const millis_in_day = 1000 * 60 * 60 * 24;
+  const yesterday = new Date();
+  yesterday.setTime(yesterday.getTime() - (millis_in_day));
+  const start_date = new Date()
+  start_date.setTime(yesterday.getTime() - ((n - 1) * millis_in_day));
+  const yesterday_string = Utilities.formatDate(yesterday, 'Europe/London', 'yyyy-MM-dd');
+  const start_date_string = Utilities.formatDate(start_date, 'Europe/London', 'yyyy-MM-dd');
+  const heart_data = getDataForDateRange("heart", name, start_date_string, yesterday_string);
+  const total_hr = heart_data["activities-heart"]
+    .map(r => r.value.restingHeartRate)
+    .filter(hr => !!hr)
+    .reduce((a, b) => (a + b));
+  const days_with_data = new Set(heart_data["activities-heart"].map(r => r.dateTime)).size;
+  const average_hr = Math.round(total_hr / days_with_data);
+  return ({
+    average_hr: average_hr
+  });
+}
+
+const dailyFitbitHeartrateMessage = () => {
+  return (
+    [`*HR*`,
+      `Last 7 days: ${lastNDaysAverageHeartrate("Dan", 7).average_hr}`,
+      `Last 28 days: ${lastNDaysAverageHeartrate("Dan", 28).average_hr}`,
+      `Last 90 days: ${lastNDaysAverageHeartrate("Dan", 90).average_hr}`]
       .join(`\n`)
   );
 }

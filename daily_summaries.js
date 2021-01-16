@@ -3,7 +3,8 @@ const summaryChess = () => {
 }
 
 const summaryFitbit = () => {
-  sendMessage(chatId, dailyFitbitMessage());
+  sendMessage(chatId, dailyFitbitSleepMessage());
+  sendMessage(chatId, dailyFitbitHeartrateMessage());
 }
 
 const dailySummaries = () => {
