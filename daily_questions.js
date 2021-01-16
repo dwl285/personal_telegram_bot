@@ -6,7 +6,7 @@ const weekdayAndDate = () => {
   const yesterday = new Date(Date.now() - 1000 * 60 * 60 * 24)
   var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var dayName = days[yesterday.getDay()];  
-  var dateString =  Utilities.formatDate(yesterday, 'GMT', 'D MMMM');
+  var dateString =  Utilities.formatDate(yesterday, 'Europe/l', 'D MMMM');
   return `${dayName} ${dateString}`;
 }
 
