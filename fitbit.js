@@ -64,14 +64,19 @@ const refreshTokens = () => {
 
 const dateRangeUrls = {
   sleep: "https://api.fitbit.com/1.2/user/-/sleep/date",
-  heart: "https://api.fitbit.com/1/user/-/activities/heart/date"
+  heart: "https://api.fitbit.com/1/user/-/activities/heart/date",
+  steps: "https://api.fitbit.com/1/user/-/activities/steps/date"
 };
+
+const dateToString = (date) => {
+  return Utilities.formatDate(date, 'Europe/London', 'yyyy-MM-dd');
+}
 
 const getDataForDateRange = (
   type = "sleep",
   name = "Dan",
-  start_date = "2021-01-01",
-  end_date = "2021-01-11",
+  start_date = new Date(2021, 0, 1),
+  end_date = new Date(),
 ) => {
 
   // refresh tokens
@@ -86,23 +91,26 @@ const getDataForDateRange = (
     "method": "GET",
     "headers": headers
   };
-  const url = `${dateRangeUrls[type]}/${start_date}/${end_date}.json`;
+  const url = `${dateRangeUrls[type]}/${dateToString(start_date)}/${dateToString(end_date)}.json`;
   const response = UrlFetchApp.fetch(url, params);
   const data = JSON.parse(response);
   return (data);
 }
 
-/* SLEEP */
-
-const lastNDaysAverageSleep = (name = "Dan", n = 28) => {
+// Get the last N days of data for particular type of data
+const lastNDaysData = (type = "sleep", n = 28, name = "Dan") => {
   const millis_in_day = 1000 * 60 * 60 * 24;
   const yesterday = new Date();
   yesterday.setTime(yesterday.getTime() - (millis_in_day));
   const start_date = new Date()
   start_date.setTime(yesterday.getTime() - ((n - 1) * millis_in_day));
-  const yesterday_string = Utilities.formatDate(yesterday, 'Europe/London', 'yyyy-MM-dd');
-  const start_date_string = Utilities.formatDate(start_date, 'Europe/London', 'yyyy-MM-dd');
-  const sleep_data = getDataForDateRange("sleep", name, start_date_string, yesterday_string);
+  return getDataForDateRange(type, name, start_date, yesterday);
+}
+
+/* SLEEP */
+
+const lastNDaysAverageSleep = (name = "Dan", n = 28) => {
+  const sleep_data = lastNDaysData("sleep", n, name);
   const total_mins_asleep = sleep_data.sleep.map(r => r.minutesAsleep).reduce((a, b) => (a + b));
   const days_with_data = new Set(sleep_data.sleep.map(r => r.dateOfSleep)).size;
   const average_mins_of_sleep = total_mins_asleep / days_with_data;
@@ -118,6 +126,7 @@ const lastNDaysAverageSleep = (name = "Dan", n = 28) => {
 const dailyFitbitSleepMessage = () => {
   return (
     [`*Sleep*`,
+      `Yesterday: ${lastNDaysAverageSleep("Dan", 1).time_asleep_string}`,
       `Last 7 days: ${lastNDaysAverageSleep("Dan", 7).time_asleep_string}`,
       `Last 28 days: ${lastNDaysAverageSleep("Dan", 28).time_asleep_string}`,
       `Last 90 days: ${lastNDaysAverageSleep("Dan", 90).time_asleep_string}`]
@@ -128,14 +137,7 @@ const dailyFitbitSleepMessage = () => {
 /* RESTING HEART RATE */
 
 const lastNDaysAverageHeartrate = (name = "Dan", n = 90) => {
-  const millis_in_day = 1000 * 60 * 60 * 24;
-  const yesterday = new Date();
-  yesterday.setTime(yesterday.getTime() - (millis_in_day));
-  const start_date = new Date()
-  start_date.setTime(yesterday.getTime() - ((n - 1) * millis_in_day));
-  const yesterday_string = Utilities.formatDate(yesterday, 'Europe/London', 'yyyy-MM-dd');
-  const start_date_string = Utilities.formatDate(start_date, 'Europe/London', 'yyyy-MM-dd');
-  const heart_data = getDataForDateRange("heart", name, start_date_string, yesterday_string);
+  const heart_data = lastNDaysData("heart", n, name);
   const total_hr = heart_data["activities-heart"]
     .map(r => r.value.restingHeartRate)
     .filter(hr => !!hr)
@@ -150,9 +152,65 @@ const lastNDaysAverageHeartrate = (name = "Dan", n = 90) => {
 const dailyFitbitHeartrateMessage = () => {
   return (
     [`*HR*`,
+      `Yesterday: ${lastNDaysAverageHeartrate("Dan", 1).average_hr}`,
       `Last 7 days: ${lastNDaysAverageHeartrate("Dan", 7).average_hr}`,
       `Last 28 days: ${lastNDaysAverageHeartrate("Dan", 28).average_hr}`,
       `Last 90 days: ${lastNDaysAverageHeartrate("Dan", 90).average_hr}`]
+      .join(`\n`)
+  );
+}
+
+/* STEPS */
+
+// a function to take a date and return the same date from the previous year
+const getDayLastYear = (date) => {
+  return new Date(date.getFullYear() - 1, date.getMonth(), date.getDate())
+}
+
+// a function to take a range of steps data and return some summary statistics
+const summariseSteps = (data) => {
+  return {
+    steps: data.map(d => parseInt(d.value)).reduce((a, b) => (a + b)),
+    days: new Set(data.map(r => r.dateTime)).size
+  }
+}
+const stepStatsYTD = (name = "Dan") => {
+  const millis_in_day = 1000 * 60 * 60 * 24;
+  var yesterday = new Date(Date.now() - millis_in_day);
+  const yesterday_ly = getDayLastYear(yesterday);
+  const new_years_day = new Date(yesterday.getFullYear(), 0, 1);
+  const new_years_day_ly = getDayLastYear(new_years_day);
+  const new_years_eve_ly = new Date(new_years_day_ly.getFullYear(), 11, 31);
+  const steps_data_ty = getDataForDateRange("steps", name, new_years_day, yesterday);
+  const steps_data_ly_td = getDataForDateRange("steps", name, new_years_day_ly, yesterday_ly);
+  const steps_data_ly_full = getDataForDateRange("steps", name, new_years_day_ly, new_years_eve_ly);
+  const steps_summary_ty = summariseSteps(steps_data_ty["activities-steps"]);
+  const steps_summary_ly_td = summariseSteps(steps_data_ly_td["activities-steps"]);
+  const steps_summary_ly_full = summariseSteps(steps_data_ly_full["activities-steps"]);
+  return ({
+    ty: steps_summary_ty,
+    lytd: steps_summary_ly_td,
+    lyf: steps_summary_ly_full
+  })
+}
+
+// Format the steps number to more readable
+const formatSteps = (steps, dp=0) => {
+  const options = {
+      0: `${Math.floor(steps/1000)}k`,
+      1: `${Math.floor(steps/100)/10}k`
+  };
+  return options[dp];
+}
+
+const dailyFitbitStepsMessage = () => {
+  const d = stepStatsYTD("Dan");
+  const projected_steps = d.lyf.days*d.ty.steps/d.ty.days;
+  return (
+    [`*Steps*`,
+      `YTD Steps: ${formatSteps(d.ty.steps)}, ${formatSteps(d.ty.steps/d.ty.days, 0)}/day`,
+      `Last YTD Steps: ${formatSteps(d.lytd.steps)}, ${formatSteps(d.lytd.steps/d.lytd.days, 0)}/day`,
+      `Projected steps: ${formatSteps(projected_steps)} vs ${formatSteps(d.lyf.steps)} last year`,]
       .join(`\n`)
   );
 }
