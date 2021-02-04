@@ -8,7 +8,6 @@ const weekdayAndDate = () => {
   var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var dayName = days[yesterday.getDay()];  
   var dateString =  Utilities.formatDate(yesterday, 'Europe/London', 'd MMMM');
-  console.log(yesterday);
   return `${dayName} ${dateString}`;
 }
 
