@@ -3,10 +3,12 @@
  *
  */
 const weekdayAndDate = () => {
-  const yesterday = new Date(Date.now() - 1000 * 60 * 60 * 24)
+  var yesterday = new Date();
+  yesterday.setTime(yesterday.getTime() - (1000 * 60 * 60 * 24));
   var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var dayName = days[yesterday.getDay()];  
-  var dateString =  Utilities.formatDate(yesterday, 'Europe/London', 'D MMMM');
+  var dateString =  Utilities.formatDate(yesterday, 'Europe/London', 'd MMMM');
+  console.log(yesterday);
   return `${dayName} ${dateString}`;
 }
 
