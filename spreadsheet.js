@@ -19,7 +19,12 @@ const spreadsheetLog = (note, log_message) => {
  * @param {string} question Which question the user was replying to
  * @param {string} response The user's response
  */
-const recordResponse = (user, question, response) => {
-  SpreadsheetApp.openById(spreadsheetID).getSheetByName("Data")
-    .appendRow([Utilities.formatDate(new Date(), 'Europe/London', 'YYYY-MM-DD HH:mm:ss'), user, question, response]);
+const recordResponse = (user = "dev", question = "a question", response = "an answer") => {
+  const date = Utilities.formatDate(new Date(), 'Europe/London', 'YYYY-MM-DD HH:mm:ss');
+  SpreadsheetApp.openById(spreadsheetID).getSheetByName(spreadsheetInputName)
+    .appendRow([date, user, question, response]);
+  
+  // insert to BQ
+  const data = [{date: date, user: user, question: question, response: response}];
+  insertDataBQ(data, "daily_questions", bqDatasetName);
 }
