@@ -4,6 +4,8 @@ const currentEnvironment = "PROD";
 const testChatID = -417576688;
 const prodChatID = -484842241;
 const chatId = currentEnvironment === "TEST" ? testChatID : prodChatID;
+const bqDatasetName = currentEnvironment === "TEST" ? "telegram_dev" : "telegram_prod";
+const spreadsheetInputName = currentEnvironment === "TEST" ? "DataDev" : "Data";
 
 /**
  * The function that Telegram calls every time a message happens in the chatroom
