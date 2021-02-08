@@ -9,7 +9,7 @@ const spreadsheetID = "1WObtaVTWcNgyPTNCDtI09eIQwRCaKcUjQAivailWI_o";
  */
 const spreadsheetLog = (note, log_message) => {
   SpreadsheetApp.openById(spreadsheetID).getSheetByName("Logs")
-    .appendRow([Utilities.formatDate(new Date(), 'Europe/London', 'YYYY-MM-DD HH:mm:ss'), note, log_message]);
+    .appendRow([Utilities.formatDate(new Date(), 'Europe/London', 'YYYY-MM-dd HH:mm:ss'), note, log_message]);
 }
 
 /**
@@ -21,11 +21,9 @@ const spreadsheetLog = (note, log_message) => {
  */
 const recordResponse = (user = "dev", question = "a question", response = "an answer") => {
   const date = Utilities.formatDate(new Date(), 'Europe/London', 'YYYY-MM-dd HH:mm:ss');
-  console.log(date);
-  // SpreadsheetApp.openById(spreadsheetID).getSheetByName(spreadsheetInputName)
-  //   .appendRow([date, user, question, response]);
-  
-  // // insert to BQ
-  // const data = [{date: date, user: user, question: question, response: response}];
-  // insertDataBQ(data, "daily_questions", bqDatasetName);
+  SpreadsheetApp.openById(spreadsheetID).getSheetByName(spreadsheetInputName)
+    .appendRow([date, user, question, response]);
+  // insert to BQ
+  const data = [{date: date, user: user, question: question, response: response}];
+  insertDataBQ(data, "daily_questions", bqDatasetName);
 }
