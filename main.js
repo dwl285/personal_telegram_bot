@@ -32,7 +32,7 @@ const doPost = (e) => {
 
     recordResponse(responder_first_name, original_question, users_choice);
     answerCallback(callback_query_id, "Ack");
-    sendMessage(chatroom_id, "Got it!");
+    sendMessage(chatroom_id, "Got it");
   }
   // handle regular messages
   else {
