@@ -14,9 +14,9 @@ const dailyChessMessage = () => {
   const rapid_games_EOY = Math.round(rapid_games_YTD * (365 / days_YTD));
 
   return(
-    [`*Chess*`,
+    [`♟️`,
       `${rapid_games_YTD} games played`,
-      `Expected games: ${rapid_games_EOY} vs\\. ${rapid_games_goal} target`]
+      `Expected games: ${rapid_games_EOY} vs. ${rapid_games_goal} target`]
       .join(`\n`)
   );
 }

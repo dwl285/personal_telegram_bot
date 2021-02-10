@@ -125,7 +125,7 @@ const lastNDaysAverageSleep = (name = "Dan", n = 28) => {
 
 const dailyFitbitSleepMessage = () => {
   return (
-    [`*Sleep*`,
+    [`😴`,
       `Yesterday: ${lastNDaysAverageSleep("Dan", 1).time_asleep_string}`,
       `Last 7 days: ${lastNDaysAverageSleep("Dan", 7).time_asleep_string}`,
       `Last 28 days: ${lastNDaysAverageSleep("Dan", 28).time_asleep_string}`,
@@ -151,7 +151,7 @@ const lastNDaysAverageHeartrate = (name = "Dan", n = 90) => {
 
 const dailyFitbitHeartrateMessage = () => {
   return (
-    [`*HR*`,
+    [`💓`,
       `Yesterday: ${lastNDaysAverageHeartrate("Dan", 1).average_hr}`,
       `Last 7 days: ${lastNDaysAverageHeartrate("Dan", 7).average_hr}`,
       `Last 28 days: ${lastNDaysAverageHeartrate("Dan", 28).average_hr}`,
@@ -207,7 +207,7 @@ const dailyFitbitStepsMessage = () => {
   const d = stepStatsYTD("Dan");
   const projected_steps = d.lyf.days*d.ty.steps/d.ty.days;
   return (
-    [`*Steps*`,
+    [`🚶‍♂️`,
       `YTD Steps: ${formatSteps(d.ty.steps)}, ${formatSteps(d.ty.steps/d.ty.days, 0)}/day`,
       `Last YTD Steps: ${formatSteps(d.lytd.steps)}, ${formatSteps(d.lytd.steps/d.lytd.days, 0)}/day`,
       `Projected steps: ${formatSteps(projected_steps)} vs ${formatSteps(d.lyf.steps)} last year`,]
