@@ -21,7 +21,7 @@ const sendMessage = (chat_id, text) => {
   const data = {
     'chat_id': chat_id,
     'text': text,
-    'parse_mode': 'MarkdownV2'
+    'parse_mode': 'HTML'
   };
   const options = {
     'method': 'post',
