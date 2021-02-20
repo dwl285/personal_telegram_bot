@@ -1,13 +1,15 @@
-const telegramUrl = "https://api.telegram.org/bot" + botToken;
-const webAppUrl = "https://script.google.com/macros/s/AKfycbxZJk6vRe80-6SPifMnfaKICF2V6nOjYdyVWwZg1Kb8yO6P5qlyaHLXRw/exec";
+const telegramBaseUrl = "https://api.telegram.org/bot";
+const telegramUrl = telegramBaseUrl + environmentConfig.bot.token;
 
 /**
  * Connects the bot to the webapp. Only needs to run once, initially
  */
 const setWebhook = () => {
-  const url = telegramUrl + "/setWebhook?url=" + webAppUrl;
-  const response = UrlFetchApp.fetch(url);
-  spreadsheetLog("Webhook set", response);
+  environmentConfigs.map((e) => {
+    const url = telegramBaseUrl + e.bot.token + "/setWebhook?url=" + e.url;
+    const response = UrlFetchApp.fetch(url);
+    spreadsheetLog("Webhook set", response);
+  })
 }
 
 /**
@@ -40,7 +42,7 @@ const sendMessage = (chat_id, text) => {
  * @param {string} text The message to send
  * @param {keyboard} object The canned responses that the user can tap
  */
-const sendQuestion = (chat_id, text, keyboard) => {
+const sendQuestion = (chat_id, text = "hello", keyboard = null) => {
   // Make a POST request with a JSON payload.
   const data = {
     'chat_id': chat_id,
@@ -129,9 +131,9 @@ function padSpaces(text, totalLength) {
   var textLength = text.length;
   if (textLength <= totalLength) {
     var delta = totalLength - textLength;
-    return(" ".repeat(delta) +  text);
+    return (" ".repeat(delta) + text);
   }
   else {
-    return(text.substring(0, totalLength));
+    return (text.substring(0, totalLength));
   }
 }

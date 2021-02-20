@@ -1,20 +1,9 @@
-// const currentEnvironment = "TEST";
-const currentEnvironment = "PROD";
-
-const testChatID = -417576688;
-const prodChatID = -484842241;
-const chatId = currentEnvironment === "TEST" ? testChatID : prodChatID;
-const bqDatasetName = currentEnvironment === "TEST" ? "telegram_dev" : "telegram_prod";
-const spreadsheetInputName = currentEnvironment === "TEST" ? "DataDev" : "Data";
-
 /**
  * The function that Telegram calls every time a message happens in the chatroom
  *
  * @param {event} e The event parameter of the request from Telegram
  */
 const doPost = (e) => {
-  spreadsheetLog("Received message test", e.postData.getDataAsString());
-
   const contents = JSON.parse(e.postData.getDataAsString());
 
   // handle responses to the survey
@@ -36,6 +25,7 @@ const doPost = (e) => {
   }
 }
 
-const goGet = (e) => {
-  return "hello world";
+const doGet = (e) => {
+  var params = JSON.stringify(e);
+  return HtmlService.createHtmlOutput(params);
 }
