@@ -5,6 +5,7 @@
  */
 const doPost = (e) => {
   const contents = JSON.parse(e.postData.getDataAsString());
+  spreadsheetLog("Received post update", contents);
 
   // handle responses to the survey
   if ('callback_query' in contents) {
@@ -19,9 +20,14 @@ const doPost = (e) => {
     answerCallback(callback_query_id, "Ack");
     sendMessage(chatroom_id, "Got it");
   }
-  // handle regular messages
+  else if (contents.message.text === "/dailyquestions") {
+    dailyQuestions();
+  }
+  else if (contents.message.text === "/dailysummaries") {
+    dailySummaries();
+  }
   else {
-    // not currently taking any action
+    // do nothing
   }
 }
 

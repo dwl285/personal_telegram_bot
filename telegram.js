@@ -12,6 +12,24 @@ const setWebhook = () => {
   })
 }
 
+const sendMessageTest = (chat_id = -417576688, text = "hello123") => {
+  // Make a POST request with a JSON payload.
+  const data = {
+    'chat_id': chat_id,
+    'text': text,
+    'parse_mode': 'HTML'
+  };
+  const options = {
+    'method': 'post',
+    'contentType': 'application/json',
+    // Convert the JavaScript object to a JSON string.
+    'payload': JSON.stringify(data)
+  };
+  console.log(options);
+  const response = UrlFetchApp.fetch("https://api.telegram.org/bot1686723181:AAHU140FEidQQ-6oZe7l1VxOlcDxsYVoZR8/sendMessage", options);
+}
+
+
 /**
  * Sends a message
  *
