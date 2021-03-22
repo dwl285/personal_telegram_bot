@@ -17,8 +17,13 @@ const doPost = (e) => {
     const chatroom_id = message.chat.id;
 
     recordResponse(responder_first_name, original_question, users_choice);
+
+    const question_type = getQuestionType(original_question);
+    const streak_data = getStreaks(question_type);
+    const streak_message = createStreakMessage(streak_data, question_type);
+
     answerCallback(callback_query_id, "Ack");
-    sendMessage(chatroom_id, "Got it");
+    sendMessage(chatroom_id, streak_message);
   }
   else if (contents.message.text === "/dailyquestions") {
     dailyQuestions();
@@ -29,6 +34,20 @@ const doPost = (e) => {
   else {
     // do nothing
   }
+}
+
+const getQuestionType = (question = "Did you have a drink?") => {
+  return question.search("drink") > 0 ? "DRINKING" :
+    question.search("chess") > 0 ? "CHESS" :
+      question.search("piano") > 0 ? "PIANO" :
+        question.search("reading") > 0 ? "READING" :
+          question.search("exercise") > 0 ? "EXERCISE" : undefined;
+}
+
+const createStreakMessage = (streakData, question_type) => {
+  return streakData.streakType === "0" ?
+    `${question_type}: Oh no, it's been ${streakData.streakLength} days, get back on it!` :
+    `${question_type}: Way to go, you're on a ${streakData.streakLength} day streak!`;
 }
 
 const doGet = (e) => {
