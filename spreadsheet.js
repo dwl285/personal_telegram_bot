@@ -27,3 +27,16 @@ const recordResponse = (user = "dev", question = "a question", response = "an an
   const data = [{date: date, user: user, question: question, response: response}];
   insertDataBQ(data, "daily_questions", bqDatasetName);
 }
+
+const getStreaks = (question_type) => {
+  const dataRaw = getDataBQ("summary", "telegram_analysis");
+  const data = Object.create({});
+  dataRaw.rows.forEach(a => {
+    row = Object.create({});
+    row.streakType = a[dataRaw.fields.indexOf("current_streak_type")];
+    row.streakLength= a[dataRaw.fields.indexOf("current_streak_length")];
+    data[a[0]] = row;
+  });
+  return data[question_type];
+
+}
