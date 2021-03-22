@@ -1,10 +1,13 @@
-if ((typeof GasTap) === 'undefined') { // GasT Initialization. (only if not initialized yet.)
-  eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
-} // Class GasTap is ready for use now!
 
-var test = new GasTap();
 
 function gastTestRunner() {
+  if ((typeof GasTap) === 'undefined') { // GasT Initialization. (only if not initialized yet.)
+    eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
+  } // Class GasTap is ready for use now!
+
+  var test = new GasTap({
+    printer: function (msg) { console.log(msg); }
+  })
 
   test('getQuestionType', (t) => {
     const type = getQuestionType("Did you drink yesterday?");
@@ -18,10 +21,17 @@ function gastTestRunner() {
   })
 
   test('createStreakMessage', (t) => {
-    const msg = createStreakMessage({"streakType": "0", "streakLength": "10"}, "CHESS");
+    const msg = createStreakMessage({ "streakType": "0", "streakLength": "10" }, "CHESS");
     t.equal(msg, "CHESS: Oh no, it's been 10 days, get back on it!", "bad streak message is correct chess");
   })
 
 
   test.finish()
+  // temporary workaround whilst I figure out how to get the function to log to the CLI
+  if (test.totalFailed() > 0) {
+    throw "Some test(s) failed!"
+  }
+    if (test.totalFailed() === 0) {
+    return("All tests passed.")
+  }
 }
