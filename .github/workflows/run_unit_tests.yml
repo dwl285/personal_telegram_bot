@@ -33,7 +33,7 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Move global clasp creds
-        run: cp .globalclasprc.json > $HOME/.clasprc.json
+        run: cp .globalclasprc.json $HOME/.clasprc.json
           
       - name: clasp deploy
         # should only require global auth
@@ -41,4 +41,4 @@ jobs:
           
       - name: Run unit tests
         # requires local auth
-        run: clasp run getDataBQ
+        run: clasp run gastTestRunner
