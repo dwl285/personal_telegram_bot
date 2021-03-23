@@ -1,5 +1,5 @@
-
-
+// test
+// test 2
 function gastTestRunner() {
   console.log("start testing");
   if ((typeof GasTap) === 'undefined') { // GasT Initialization. (only if not initialized yet.)
