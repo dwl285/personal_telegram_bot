@@ -37,6 +37,8 @@ jobs:
 #           client-id: ${{ secrets.CLASP_CLIENT_ID }}
 #           client-secret: ${{ secrets.CLASP_CLIENT_SECRET }}
 #           refresh-token: ${{ secrets.CLASP_REFRESH_TOKEN }}
+      - name: Clasp deployments
+        run: clasp deployments
           
       - name: Run unit tests
         run: clasp run getDataBQ
