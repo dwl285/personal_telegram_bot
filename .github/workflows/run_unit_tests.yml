@@ -31,12 +31,13 @@ jobs:
       - name: Set clasprc creds (global auth?)
         run: echo ${{secrets.CLASPRC_CREDENTIALS }} > $HOME/.clasprc.json
         
-#       - name: Get clasprc (local auth?)
-#         uses: namaggarwal/clasp-token-action@v0.0.1
-#         with:
-#           client-id: ${{ secrets.CLASP_CLIENT_ID }}
-#           client-secret: ${{ secrets.CLASP_CLIENT_SECRET }}
-#           refresh-token: ${{ secrets.CLASP_REFRESH_TOKEN }}
+      - name: Get clasprc (local auth?)
+        uses: namaggarwal/clasp-token-action@v0.0.1
+        with:
+          client-id: ${{ secrets.CLASP_CLIENT_ID }}
+          client-secret: ${{ secrets.CLASP_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CLASP_REFRESH_TOKEN }}
+
       - name: Clasp deployments
         run: clasp deployments
           
