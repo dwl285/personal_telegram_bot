@@ -1,5 +1,5 @@
-
-
+// test
+// test 2
 function gastTestRunner() {
   console.log("start testing");
   if ((typeof GasTap) === 'undefined') { // GasT Initialization. (only if not initialized yet.)
@@ -15,6 +15,41 @@ function gastTestRunner() {
     t.equal(type, "DRINKING", "getQuestionType is correct for drink");
   })
 
+  // utils
+  test('daysYTD', (t) => {
+    t.ok(Number.isInteger(daysYTD(2021)), "days YTD is a valid integer");
+  })
+
+  test('icons', (t) => {
+    t.ok(icons().chess, "chess icon exists");
+  })
+
+  // chess
+  test('getChessCOMData', (t) => {
+    const chessData = getChessCOMData("dwl285");
+    t.ok(chessData.chess_rapid, "chess_rapid exists");
+    t.ok(chessData.chess_rapid.record, "chess_rapid.record exists");
+    t.ok(chessData.chess_rapid.record.win + chessData.chess_rapid.record.loss + chessData.chess_rapid.record.draw > 0, "chess_rapid.record has values");
+  })
+
+  test('getChessUserGoals', (t) => {
+    const chessUserGoals = getChessUserGoals("dwl285", "rapid");
+    t.equal(chessUserGoals.gamesAtStartOfYear, 15, "dwl285 rapid games start of year is correct");
+    t.equal(chessUserGoals.gamesGoal, 200, "dwl285 rapid games goal is correct");
+  })
+
+  test('getChessStats', (t) => {
+    const chessStats = getChessStats("dwl285", "rapid", 2021);
+    t.ok(chessStats.gamesYTD, "gamesYTD exists");
+    t.ok(chessStats.gamesEOY, "gamesEOY exists");
+    t.ok(chessStats.gamesGoal, "gamesGoal exists");
+  })
+
+  test('getDailyChessMessage', (t) => {
+    t.ok(getDailyChessMessage("dwl285", "rapid", 2021).length > 10, "Chess message is roughly the right length");
+  })
+
+  // streaks
   test('getStreaks', (t) => {
     const streak_data = getStreaks("CHESS");
     t.ok(streak_data.streakType, "streakType exists");
@@ -32,8 +67,8 @@ function gastTestRunner() {
   if (test.totalFailed() > 0) {
     throw "Some test(s) failed!"
   }
-    if (test.totalFailed() === 0) {
-    return("All tests passed!")
+  if (test.totalFailed() === 0) {
+    return ("All tests passed!")
   }
   console.log("end testing");
 }

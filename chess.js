@@ -1,22 +1,42 @@
-const dailyChessMessage = () => {
-  const api_response = UrlFetchApp.fetch("https://api.chess.com/pub/player/dwl285/stats");
-  const contents = JSON.parse(api_response);
-  const rapid_stats = contents.chess_rapid;
-  const rapid_games = rapid_stats.record.win + rapid_stats.record.draw + rapid_stats.record.loss;
+const getChessUserGoals = (username, gameType) => {
+  return {
+    "dwl285": {
+      "rapid": {
+        gamesAtStartOfYear: 15,
+        gamesGoal: 200
+      }
+    }
+  }[username][gameType];
+}
 
-  const rapid_games_at_start_of_year = 15;
-  const rapid_games_goal = 200;
+const getChessCOMData = (username) => {
+  const url = `https://api.chess.com/pub/player/${username}/stats`;
+  const apiResponse = UrlFetchApp.fetch(url);
+  return JSON.parse(apiResponse);
+}
 
-  const rapid_games_YTD = rapid_games - rapid_games_at_start_of_year;
-  // 1610293629808
-  // 1612137600000
-  const days_YTD = Math.floor((Date.now() - Date.UTC(2021, 0, 1)) / (1000 * 60 * 60 * 24));
-  const rapid_games_EOY = Math.round(rapid_games_YTD * (365 / days_YTD));
+const getChessStats = (username, gameType, year) => {
+  const goalsData = getChessUserGoals(username, gameType);
+  const chessComData = getChessCOMData(username);
+  const stats = chessComData[`chess_${gameType}`];
+  const games = stats.record.win + stats.record.draw + stats.record.loss;
+  const gamesYTD = games - goalsData.gamesAtStartOfYear;
+  const gamesEOY = Math.round(gamesYTD * (365 / daysYTD(year)));
 
-  return(
-    [`♟️`,
-      `${rapid_games_YTD} games played`,
-      `Expected games: ${rapid_games_EOY} vs. ${rapid_games_goal} target`]
+  return {
+    gamesYTD: gamesYTD,
+    gamesEOY: gamesEOY,
+    gamesGoal: goalsData.gamesGoal
+  }
+}
+
+const getDailyChessMessage = (username, gameType, year) => {
+  const chessStats = getChessStats(username, gameType, year);
+
+  return (
+    [icons().chess,
+    `${chessStats.gamesYTD} games played`,
+    `Expected games: ${chessStats.gamesEOY} vs. ${chessStats.gamesGoal} target`]
       .join(`\n`)
   );
 }

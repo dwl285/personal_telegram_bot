@@ -38,7 +38,7 @@ const summaryResponses = () => {
 }
 
 const summaryChess = () => {
-  sendMessage(chatId, dailyChessMessage());
+  sendMessage(chatId, getDailyChessMessage("dwl285", "rapid", 2021));
 }
 
 const summaryFitbit = () => {
