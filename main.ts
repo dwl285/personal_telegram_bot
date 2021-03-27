@@ -4,8 +4,10 @@
  * @param {event} e The event parameter of the request from Telegram
  */
 const doPost = (e) => {
+  const environment = new Environments().currentEnvironment();
+
   const contents = JSON.parse(e.postData.getDataAsString());
-  spreadsheetLog("Received post update", contents);
+  spreadsheetLog("Received post update", contents, environment.answerLogSheet.spreadsheet);
 
   // handle responses to the survey
   if ('callback_query' in contents) {
@@ -16,7 +18,8 @@ const doPost = (e) => {
     const original_question = message.text;
     const chatroom_id = message.chat.id;
 
-    recordResponse(responder_first_name, original_question, users_choice);
+    recordResponse(responder_first_name, original_question,
+      users_choice, environment.answerLogSheet, environment.bqDatasetName);
 
     const question_type = getQuestionType(original_question);
     const streak_data = getStreaks(question_type);

@@ -1,3 +1,4 @@
+
 /**
  * Helper function that prepares the right date format for the AskAlcohol message
  *
@@ -11,35 +12,39 @@ const weekdayAndDate = () => {
   return `${dayName} ${dateString}`;
 }
 
-const askYesNoYesterday = (chatId, message) => {
+const askYesNoYesterday = (chatId: number, message: string) => {
+  const telegram = new Telegram();
   const question = `${message} yesterday, ${weekdayAndDate()}?`;
-  return sendQuestion(chatId, question, keyboard = yesNoKeyboard);
+  return sendQuestion(chatId, question, telegram.yesNoKeyboard);
 }
 
-const askAlcohol = () => {
+const askAlcohol = (chatId: number) => {
   askYesNoYesterday(chatId, "Did you drink");
 }
 
-const askPiano = () => {
+const askPiano = (chatId: number) => {
   askYesNoYesterday(chatId, "Did you play the piano");
 }
 
-const askChess = () => {
+const askChess = (chatId: number) => {
   askYesNoYesterday(chatId, "Did you play chess");
 }
 
-const askExercise = () => {
+const askExercise = (chatId: number) => {
   askYesNoYesterday(chatId, "Did you exercise");
 }
 
-const askRead = () => {
+const askRead = (chatId: number) => {
   askYesNoYesterday(chatId, "Did you read");
 }
 
 const dailyQuestions = () => {
-  askAlcohol();
-  askPiano();
-  askChess();
-  askExercise();
-  askRead();
+  const environment = new Environments().currentEnvironment();
+  const chatId = environment.bot.chatId;
+
+  askAlcohol(chatId);
+  askPiano(chatId);
+  askChess(chatId);
+  askExercise(chatId);
+  askRead(chatId);
 }

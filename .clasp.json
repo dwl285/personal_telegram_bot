@@ -1,1 +1,8 @@
-{"scriptId":"1PNccySOIhVQNnBlq_9M6_YTlH9YOkwZG2kZKDDUd5uwsuezQ4JfZXprW","projectId":"dan-playground-285"}
+{
+    "scriptId": "1PNccySOIhVQNnBlq_9M6_YTlH9YOkwZG2kZKDDUd5uwsuezQ4JfZXprW",
+    "projectId": "dan-playground-285",
+    "filePushOrder": [
+        "classes.ts",
+        "bigquery.ts"
+    ]
+}

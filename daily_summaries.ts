@@ -1,3 +1,5 @@
+const dan = new User("dan", new ChessComSettings("dwl285", "rapid", 15, 200));
+
 // handler function to turn a string of unknown length to
 // a string of fixed length by adding whitespace to the end 
 // (or trimming characters from the end)
@@ -33,22 +35,24 @@ const responseSummaryMessage = () => {
   return `<pre> ${message} </pre>`;
 }
 
-const summaryResponses = () => {
+const summaryResponses = (chatId: number): void => {
   sendMessage(chatId, responseSummaryMessage());
 }
 
-const summaryChess = () => {
-  sendMessage(chatId, dailyChessMessage());
+const summaryChess = (chatId: number): void => {
+  sendMessage(chatId, getDailyChessMessage(dan, 2021));
 }
 
-const summaryFitbit = () => {
+const summaryFitbit = (chatId: number): void => {
   sendMessage(chatId, dailyFitbitSleepMessage());
   sendMessage(chatId, dailyFitbitHeartrateMessage());
   sendMessage(chatId, dailyFitbitStepsMessage());
 }
 
-const dailySummaries = () => {
-  summaryResponses();
-  summaryChess();
-  summaryFitbit();
+const dailySummaries = (): void => {
+  const environment = new Environments().currentEnvironment();
+  const chatId = environment.bot.chatId;
+  summaryResponses(chatId);
+  summaryChess(chatId);
+  summaryFitbit(chatId);
 }
