@@ -25,27 +25,27 @@ function responseSummaryMessage(): string {
     .join("\n");
 
   return `<pre> ${message} </pre>`;
-};
+}
 
 function summaryResponses(chatId: TelegramChatId): void {
   const message = responseSummaryMessage();
   sendMessage(chatId, message);
-};
+}
 
 function summaryChess(chatId: TelegramChatId, user: User): void {
   sendMessage(chatId, getDailyChessMessage(user));
-};
+}
 
-function summaryFitbit(chatId: TelegramChatId): void {
-  sendMessage(chatId, dailyFitbitSleepMessage());
-  sendMessage(chatId, dailyFitbitHeartrateMessage());
-  sendMessage(chatId, dailyFitbitStepsMessage());
-};
+function summaryFitbit(chatId: TelegramChatId, user: User): void {
+  sendMessage(chatId, dailyFitbitSleepMessage(user));
+  sendMessage(chatId, dailyFitbitHeartrateMessage(user));
+  sendMessage(chatId, dailyFitbitStepsMessage(user));
+}
 
 function sendDailySummaries(user: User): void {
   const environment = new Environments().currentEnvironment();
   const chatId = environment.bot.chatId;
   summaryResponses(chatId);
   summaryChess(chatId, user);
-  summaryFitbit(chatId);
-};
+  summaryFitbit(chatId, user);
+}
