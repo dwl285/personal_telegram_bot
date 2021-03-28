@@ -29,7 +29,7 @@ const sendMessage = (chat_id: TelegramChatId, text: string): void => {
   spreadsheetLog("Sent message", String(response));
 }
 
-const sendQuestion = (chat_id, text = "hello", keyboard = null) => {
+const sendQuestion = (chat_id: TelegramChatId, text: string, keyboard = {}): void => {
   // Make a POST request with a JSON payload.
   const data = {
     'chat_id': chat_id,
@@ -46,7 +46,7 @@ const sendQuestion = (chat_id, text = "hello", keyboard = null) => {
   spreadsheetLog("Sent message", String(response));
 }
 
-const answerCallback = (callback_query_id, text) => {
+const answerCallback = (callback_query_id: string, text: string): void => {
   // Make a POST request with a JSON payload.
   const data = {
     'callback_query_id': callback_query_id,
@@ -62,7 +62,7 @@ const answerCallback = (callback_query_id, text) => {
   spreadsheetLog("Answered callback", String(response));
 }
 
-const editMessageReplyMarkup = (chat_id, message_id, reply_markup) => {
+const editMessageReplyMarkup = (chat_id: TelegramChatId, message_id: number, reply_markup: string): void => {
   // Make a POST request with a JSON payload.
   const data = {
     'chat_id': chat_id,
@@ -79,7 +79,8 @@ const editMessageReplyMarkup = (chat_id, message_id, reply_markup) => {
   spreadsheetLog("Edited message reply markup", String(response));
 }
 
-function padSpaces(text, totalLength) {
+function padSpaces(input: string, totalLength: number): string {
+  const text = `${input}`;
   var textLength = text.length;
   if (textLength <= totalLength) {
     var delta = totalLength - textLength;

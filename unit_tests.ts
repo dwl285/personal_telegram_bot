@@ -1,13 +1,15 @@
 // test
 // test 2
 function gastTestRunner() {
+  const users = new Users();
+  const testUser = users.list[0];
   console.log("start testing");
   if ((typeof GasTap) === 'undefined') { // GasT Initialization. (only if not initialized yet.)
     eval(UrlFetchApp.fetch('https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js').getContentText())
   } // Class GasTap is ready for use now!
 
   var test = new GasTap({
-    printer: function (msg) { consle.log(msg); }
+    printer: function (msg) { console.log(msg); }
   })
 
   test('getQuestionType', (t) => {
@@ -17,32 +19,31 @@ function gastTestRunner() {
 
   // utils
   test('daysYTD', (t) => {
-    t.ok(Number.isInteger(daysYTD(2021)), "days YTD is a valid integer");
+    const daysYTD = new DateUtils().daysYTD(2021);
+    t.ok(Number.isInteger(daysYTD), "days YTD is a valid integer");
   })
 
   test('icons', (t) => {
-    t.ok(icons().chess, "chess icon exists");
+    t.ok(new MessageUtils().icons.chess, "chess icon exists");
   })
 
   // chess
-  const dwl285 = new ChessComSettings("dwl285", "rapid", 10, 200);
-  const dan = new User("dan", dwl285);
   test('getChessCOMData', (t) => {
-    const chessData = getChessCOMData(dan);
+    const chessData = getChessCOMData(testUser);
     t.ok(chessData.chess_rapid, "chess_rapid exists");
     t.ok(chessData.chess_rapid.record, "chess_rapid.record exists");
     t.ok(chessData.chess_rapid.record.win + chessData.chess_rapid.record.loss + chessData.chess_rapid.record.draw > 0, "chess_rapid.record has values");
   })
 
   test('getChessStats', (t) => {
-    const chessStats = getChessStats(dan, 2021);
+    const chessStats = getChessStats(testUser, 2021);
     t.ok(chessStats.gamesYTD, "gamesYTD exists");
     t.ok(chessStats.gamesEOY, "gamesEOY exists");
     t.ok(chessStats.gamesGoal, "gamesGoal exists");
   })
 
   test('getDailyChessMessage', (t) => {
-    t.ok(getDailyChessMessage(dan, 2021).length > 10, "Chess message is roughly the right length");
+    t.ok(getDailyChessMessage(testUser).length > 10, "Chess message is roughly the right length");
   })
 
   // streaks

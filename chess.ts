@@ -1,4 +1,4 @@
-const getChessCOMData = (user: User): any => {
+function getChessCOMData(user: User): any {
   const url = `https://api.chess.com/pub/player/${user.chess.username}/stats`;
   const apiResponse = UrlFetchApp.fetch(url);
   return JSON.parse(String(apiResponse));
@@ -19,7 +19,8 @@ const getChessStats = (user: User, year: number) => {
   }
 }
 
-const getDailyChessMessage = (user: User, year: number) => {
+const getDailyChessMessage = (user: User) => {
+  const year = new DateUtils().currentYear;
   const messageUtils = new MessageUtils;
   const chessStats = getChessStats(user, year);
 

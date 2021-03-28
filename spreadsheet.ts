@@ -4,24 +4,12 @@ const spreadsheetLog = (note: string, log_message: string): void => {
     .appendRow([Utilities.formatDate(new Date(), 'Europe/London', 'YYYY-MM-dd HH:mm:ss'), note, log_message]);
 }
 
-const recordResponse = (user: string, question: string, response: string, answerSheet: Sheet, bqDatasetName: string): void => {
+const recordResponse = (user: string, question: string, response: string): void => {
+  const environment = new Environments().currentEnvironment();
   const date = Utilities.formatDate(new Date(), 'Europe/London', 'YYYY-MM-dd HH:mm:ss');
-  SpreadsheetApp.openById(answerSheet.spreadsheet).getSheetByName(answerSheet.name)
+  SpreadsheetApp.openById(environment.answerLogSheet.spreadsheet).getSheetByName(environment.answerLogSheet.name)
     .appendRow([date, user, question, response]);
   // insert to BQ
   const data = [{date: date, user: user, question: question, response: response}];
-  insertDataBQ(data, "daily_questions", bqDatasetName);
-}
-
-const getStreaks = (question_type: QuestionType): any => {
-  const dataRaw = getDataBQ("summary", "telegram_analysis");
-  const data = Object.create({});
-  dataRaw.rows.forEach(a => {
-    var row = Object.create({});
-    row.streakType = a[dataRaw.fields.indexOf("current_streak_type")];
-    row.streakLength= a[dataRaw.fields.indexOf("current_streak_length")];
-    data[a[0]] = row;
-  });
-  return data[question_type];
-
+  insertDataBQ(data, "daily_questions");
 }
