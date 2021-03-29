@@ -190,6 +190,10 @@ class Token {
       row[0],
       row[0] === this.name ? newValue : row[1],
     ]);
+    SpreadsheetApp.openById(this.sheet.spreadsheet)
+      .getSheetByName(this.sheet.name)
+      .getDataRange()
+      .setValues(newValues);
   }
 }
 

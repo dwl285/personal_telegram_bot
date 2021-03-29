@@ -24,7 +24,7 @@ function refreshFitbitTokens(user: User): void {
   const data = JSON.parse(String(response));
 
   user.fitbit.refreshToken.setValue(data.refresh_token);
-  user.fitbit.refreshToken.setValue(data.access_token);
+  user.fitbit.accessToken.setValue(data.access_token);
 }
 
 function getDataForDateRange(
