@@ -1,35 +1,7 @@
 function gastTestRunner() {
   const testUser = Users.list()[0];
-  console.log("start testing");
-  if (typeof GasTap === "undefined") {
-    // GasT Initialization. (only if not initialized yet.)
-    eval(
-      UrlFetchApp.fetch(
-        "https://raw.githubusercontent.com/huan/gast/master/src/gas-tap-lib.js"
-      ).getContentText()
-    );
-  } // Class GasTap is ready for use now!
 
-  var test = new GasTap({
-    printer: function (msg) {
-      console.log(msg);
-    },
-  });
-
-  test("getQuestionType", (t) => {
-    const type = getQuestionType("Did you drink yesterday?");
-    t.equal(type, "DRINKING", "getQuestionType is correct for drink");
-  });
-
-  // utils
-  test("daysYTD", (t) => {
-    const daysYTD = new DateUtils().daysYTD(2021);
-    t.ok(Number.isInteger(daysYTD), "days YTD is a valid integer");
-  });
-
-  test("icons", (t) => {
-    t.ok(MessageUtils.icons.chess, "chess icon exists");
-  });
+  var test = initiateGast();
 
   // chess
   test("getChessCOMData", (t) => {
@@ -59,7 +31,87 @@ function gastTestRunner() {
     );
   });
 
-  // streaks
+  // classes
+  test("getDailyChessMessage", (t) => {
+    const token = new Token(TokenName.testToken);
+    t.ok(token.getValue(), "tokens value exists");
+    const randomString = Math.random().toString(36);
+    token.setValue(randomString);
+    t.ok(
+      token.getValue() === randomString,
+      "tokens value was correctly set by setValue"
+    );
+  });
+
+  // fitbit
+  test("getNewFitbitAccessToken", (t) => {
+    t.ok(
+      getNewFitbitAccessToken(testUser).refreshToken !=
+        testUser.fitbit.refreshToken.getValue(),
+      "Refresh token is new"
+    );
+    t.ok(
+      getNewFitbitAccessToken(testUser).refreshToken.length > 30,
+      "Refresh token is roughly the right length"
+    );
+    t.ok(
+      getNewFitbitAccessToken(testUser).accessToken !=
+        testUser.fitbit.accessToken.getValue(),
+      "Access token is new"
+    );
+    t.ok(
+      getNewFitbitAccessToken(testUser).accessToken.length > 100,
+      "Access token is roughly the right length"
+    );
+  });
+
+  test("updateFitbitTokens", (t) => {
+    t.ok(
+      updateFitbitTokens(testUser).length === 2,
+      "Two successful token updates"
+    );
+  });
+
+  test("getDataForDateRange", (t) => {
+    t.ok(
+      getDataForDateRange(
+        fitbitDataTypes.heart,
+        testUser,
+        new Date(2021, 1, 1),
+        new Date(2021, 1, 10)
+      ),
+      "Successfully got data"
+    );
+  });
+
+  test("dailyFitbitHeartrateMessage", (t) => {
+    t.ok(
+      dailyFitbitHeartrateMessage(testUser).length > 10,
+      "Successfully created heart rate message"
+    );
+  });
+
+  test("dailyFitbitSleepMessage", (t) => {
+    t.ok(
+      dailyFitbitSleepMessage(testUser).length > 10,
+      "Successfully created sleep message"
+    );
+  });
+
+  test("dailyFitbitStepsMessage", (t) => {
+    t.ok(
+      dailyFitbitStepsMessage(testUser).length > 10,
+      "Successfully created steps message"
+    );
+  });
+
+  // questions
+
+  test("getQuestionType", (t) => {
+    const type = getQuestionType("Did you drink yesterday?");
+    t.equal(type, "DRINKING", "getQuestionType is correct for drink");
+  });
+
   test("getStreaks", (t) => {
     const streak_data = getStreaks(QuestionType.Chess);
     t.ok(streak_data.streakType, "streakType exists");
@@ -76,6 +128,16 @@ function gastTestRunner() {
       "CHESS: Oh no, it's been 10 days, get back on it!",
       "bad streak message is correct chess"
     );
+  });
+
+  // utils
+  test("daysYTD", (t) => {
+    const daysYTD = new DateUtils().daysYTD(2021);
+    t.ok(Number.isInteger(daysYTD), "days YTD is a valid integer");
+  });
+
+  test("icons", (t) => {
+    t.ok(MessageUtils.icons.chess, "chess icon exists");
   });
 
   test.finish();

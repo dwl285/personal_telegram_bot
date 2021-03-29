@@ -1,5 +1,10 @@
 // refresh the access token for a user
-function refreshFitbitTokens(user: User): void {
+function getNewFitbitAccessToken(
+  user: User
+): {
+  accessToken: string;
+  refreshToken: string;
+} {
   // Get a new auth token
   const refreshToken = user.fitbit.refreshToken.getValue();
   const clientParams = FitbitUtils.clientParams.getValue();
@@ -19,9 +24,19 @@ function refreshFitbitTokens(user: User): void {
   const refreshTokenUrl = "https://api.fitbit.com/oauth2/token";
   const response = UrlFetchApp.fetch(refreshTokenUrl, params);
   const data = JSON.parse(String(response));
+  return {
+    accessToken: data.access_token,
+    refreshToken: data.refresh_token,
+  };
+}
 
-  user.fitbit.refreshToken.setValue(data.refresh_token);
-  user.fitbit.accessToken.setValue(data.access_token);
+function updateFitbitTokens(user: User): string[] {
+  const tokens = getNewFitbitAccessToken(user);
+  const responseToRefresh = user.fitbit.refreshToken.setValue(
+    tokens.refreshToken
+  );
+  const responseToAccess = user.fitbit.accessToken.setValue(tokens.accessToken);
+  return [responseToRefresh, responseToAccess];
 }
 
 function getDataForDateRange(
@@ -31,10 +46,10 @@ function getDataForDateRange(
   end_date: Date
 ): any {
   // refresh tokens
-  refreshFitbitTokens(user);
+  updateFitbitTokens(user);
 
   // Make a GET request with auth
-  const authToken = user.fitbit.accessToken;
+  const authToken = user.fitbit.accessToken.getValue();
   var headers = {
     Authorization: "Bearer " + authToken,
   };

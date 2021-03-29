@@ -26,11 +26,13 @@ enum TokenName {
   clientId = "clientId",
   clientSecret = "clientSecret",
   clientParams = "clientParams",
+  testToken = "testToken",
 }
 
 enum TokenType {
   Fitbit,
   Regular,
+  Test,
 }
 
 class Token {
@@ -49,6 +51,7 @@ class Token {
       clientSecret: TokenSheet.FitbitTokens,
       prodBotToken: TokenSheet.Tokens,
       devBotToken: TokenSheet.Tokens,
+      testToken: TokenSheet.Tokens,
     }[name];
     this.sheet = new GSheet(sheetName);
     const type = {
@@ -61,6 +64,7 @@ class Token {
       clientSecret: TokenType.Fitbit,
       prodBotToken: TokenType.Regular,
       devBotToken: TokenType.Regular,
+      testToken: TokenType.Test,
     }[name] as TokenType;
     this.type = type;
   }
@@ -73,7 +77,7 @@ class Token {
     return allTokens.find((row) => row[0] === this.name)[1];
   }
 
-  setValue(newValue: string): void {
+  setValue(newValue: string): string {
     const allTokens = SpreadsheetApp.openById(this.sheet.spreadsheet)
       .getSheetByName(this.sheet.name)
       .getDataRange()
@@ -86,6 +90,7 @@ class Token {
       .getSheetByName(this.sheet.name)
       .getDataRange()
       .setValues(newValues);
+    return `${this.name} token set to ${newValue}`;
   }
 }
 
