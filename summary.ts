@@ -27,16 +27,16 @@ function responseSummaryMessage(): string {
   return `<pre> ${message} </pre>`;
 }
 
-function summaryResponses(chatId: TelegramChatId): void {
+function sendOverallSummary(chatId: TelegramChatId): void {
   const message = responseSummaryMessage();
   sendMessage(chatId, message);
 }
 
-function summaryChess(chatId: TelegramChatId, user: User): void {
+function sendChessSummary(chatId: TelegramChatId, user: User): void {
   sendMessage(chatId, getDailyChessMessage(user));
 }
 
-function summaryFitbit(chatId: TelegramChatId, user: User): void {
+function sendFitbitSummary(chatId: TelegramChatId, user: User): void {
   sendMessage(chatId, dailyFitbitSleepMessage(user));
   sendMessage(chatId, dailyFitbitHeartrateMessage(user));
   sendMessage(chatId, dailyFitbitStepsMessage(user));
@@ -45,7 +45,7 @@ function summaryFitbit(chatId: TelegramChatId, user: User): void {
 function sendDailySummaries(user: User): void {
   const environment = Environments.currentEnvironment();
   const chatId = environment.bot.chatId;
-  summaryResponses(chatId);
-  summaryChess(chatId, user);
-  summaryFitbit(chatId, user);
+  sendOverallSummary(chatId);
+  sendChessSummary(chatId, user);
+  sendFitbitSummary(chatId, user);
 }

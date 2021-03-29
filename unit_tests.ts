@@ -3,6 +3,29 @@ function gastTestRunner() {
 
   var test = initiateGast();
 
+  // bigquery
+  test("insertDataBQ", (t) => {
+    const fake_data = [
+      {
+        date: Date(),
+        user: "gas-test",
+        question: "a question",
+        response: "an answer",
+      },
+    ];
+    t.ok(
+      insertDataBQ(fake_data, BQTableName.questionWrite).length > 0,
+      "Successfully inserted some fake data to BQ"
+    );
+  });
+
+  test("getDataBQ", (t) => {
+    t.ok(
+      getDataBQ(BQTableName.summaryRead).fields.length > 0,
+      "Successfully read data from BQ"
+    );
+  });
+
   // chess
   test("getChessCOMData", (t) => {
     const chessData = getChessCOMData(testUser);
@@ -108,8 +131,12 @@ function gastTestRunner() {
   // questions
 
   test("getQuestionType", (t) => {
-    const type = getQuestionType("Did you drink yesterday?");
-    t.equal(type, "DRINKING", "getQuestionType is correct for drink");
+    const type = getQuestionType(QuestionString.Drinking);
+    t.equal(
+      type,
+      QuestionType.Drinking,
+      "getQuestionType is correct for drink"
+    );
   });
 
   test("getStreaks", (t) => {
@@ -130,6 +157,42 @@ function gastTestRunner() {
     );
   });
 
+  // spreadsheet
+  test("spreadsheetLog", (t) => {
+    t.notThrow(
+      spreadsheetLog("unit tester", "unit testing"),
+      "spreadhseet logger is working"
+    );
+  });
+
+  // summary
+  test("responseSummaryMessage", (t) => {
+    t.ok(
+      responseSummaryMessage().length > 20,
+      "response summary message working as expected"
+    );
+  });
+
+  // telegram
+  // TODO: understand why this is failing
+  // test("sendMessage", (t) => {
+  //   t.notThrow(
+  //     sendMessage(
+  //       Environments.currentEnvironment().bot.chatId,
+  //       "this is the unit tester"
+  //     ),
+  //     "telegram send message didn't fail"
+  //   );
+  // });
+
+  // TODO: work out why this fails
+  // test("padSpaces", (t) => {
+  //   t.ok(
+  //     padSpaces("short string", 200).length === 2000,
+  //     "pad spaces creates a string of the correct length"
+  //   );
+  // });
+
   // utils
   test("daysYTD", (t) => {
     const daysYTD = new DateUtils().daysYTD(2021);
@@ -146,7 +209,6 @@ function gastTestRunner() {
     throw "Some test(s) failed!";
   }
   if (test.totalFailed() === 0) {
-    return "All tests passed!";
+    return `All ${test.totalSucceed()} tests passed!`;
   }
-  console.log("end testing");
 }
