@@ -3,9 +3,7 @@
 name: Run unit tests
 
 # Controls when the action will run. 
-on:
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+on: pull_request
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -27,23 +25,18 @@ jobs:
       - name: Install Clasp
         run: npm install -g @google/clasp
         
-      - name: Get global clasp creds
-        uses: namaggarwal/clasp-token-action@v0.0.1
-        with:
-          client-id: ${{ secrets.CLASP_CLIENT_ID }}
-          client-secret: ${{ secrets.CLASP_CLIENT_SECRET }}
-          refresh-token: ${{ secrets.CLASP_REFRESH_TOKEN }}
+      - name: Decrypt Dataform credentials
+        run: ./.decrypt_credentials.sh
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Move global clasp creds
+        run: cp .globalclasprc.json $HOME/.clasprc.json
           
       - name: clasp deploy
         # should only require global auth
         run: clasp deployments
           
-      - name: Get local clasp creds
-        run: echo { ${{secrets.CLASPRC_CREDENTIALS }} } > .clasprc.json
-      
-      - name: Check local clasp creds
-        run: cat .clasprc.json
-          
       - name: Run unit tests
         # requires local auth
-        run: clasp run getDataBQ
+        run: clasp run gastTestRunner
