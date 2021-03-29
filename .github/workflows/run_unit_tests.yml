@@ -33,9 +33,9 @@ jobs:
       - name: Move global clasp creds
         run: cp .globalclasprc.json $HOME/.clasprc.json
           
-      - name: clasp deploy
+      - name: clasp push
         # should only require global auth
-        run: clasp deployments
+        run: clasp push
           
       - name: Run unit tests
         # requires local auth
