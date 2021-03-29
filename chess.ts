@@ -15,19 +15,17 @@ const getChessStats = (user: User, year: number) => {
   return {
     gamesYTD: gamesYTD,
     gamesEOY: gamesEOY,
-    gamesGoal: user.chess.gamesGoal
-  }
-}
+    gamesGoal: user.chess.gamesGoal,
+  };
+};
 
 const getDailyChessMessage = (user: User) => {
   const year = new DateUtils().currentYear;
-  const messageUtils = new MessageUtils;
   const chessStats = getChessStats(user, year);
 
-  return (
-    [messageUtils.icons.chess,
+  return [
+    MessageUtils.icons.chess,
     `${chessStats.gamesYTD} games played`,
-    `Expected games: ${chessStats.gamesEOY} vs. ${chessStats.gamesGoal} target`]
-      .join(`\n`)
-  );
-}
+    `Expected games: ${chessStats.gamesEOY} vs. ${chessStats.gamesGoal} target`,
+  ].join(`\n`);
+};

@@ -1,20 +1,18 @@
-const setWebhook = (environments: Environments): void => {
-  const telegram = new Telegram();
-  [environments.prod, environments.dev].map((e) => {
-    const url = telegram.apiBaseUrl + e.bot.token + "/setWebhook?url=" + e.url;
+const setWebhook = (): void => {
+  Environments.list().map((e) => {
+    const url = Telegram.apiBaseUrl + e.bot.token + "/setWebhook?url=" + e.url;
     const response = String(UrlFetchApp.fetch(url));
     spreadsheetLog("Webhook set", response);
   });
 };
 
 function callTelegramApi(
-  endpoint: TelegramEndpoint,
+  endpoint: Telegram.Endpoint,
   options: any
 ): GoogleAppsScript.URL_Fetch.HTTPResponse {
-  const telegram = new Telegram();
-  const botToken = new Environments().currentEnvironment().bot.token;
+  const botToken = Environments.currentEnvironment().bot.token;
   return UrlFetchApp.fetch(
-    telegram.apiBaseUrl + botToken + "/" + endpoint,
+    Telegram.apiBaseUrl + botToken + "/" + endpoint,
     options
   );
 }
@@ -32,7 +30,7 @@ const sendMessage = (chat_id: TelegramChatId, text: string): void => {
     // Convert the JavaScript object to a JSON string.
     payload: JSON.stringify(data),
   };
-  const response = callTelegramApi("sendMessage", options);
+  const response = callTelegramApi(Telegram.Endpoint.sendMessaege, options);
   spreadsheetLog("Sent message", String(response));
 };
 
@@ -53,7 +51,7 @@ const sendQuestion = (
     // Convert the JavaScript object to a JSON string.
     payload: JSON.stringify(data),
   };
-  const response = callTelegramApi("sendMessage", options);
+  const response = callTelegramApi(Telegram.Endpoint.sendMessaege, options);
   spreadsheetLog("Sent message", String(response));
 };
 
@@ -69,7 +67,10 @@ const answerCallback = (callback_query_id: string, text: string): void => {
     // Convert the JavaScript object to a JSON string.
     payload: JSON.stringify(data),
   };
-  const response = callTelegramApi("answerCallbackQuery", options);
+  const response = callTelegramApi(
+    Telegram.Endpoint.answerCallbackQuery,
+    options
+  );
   spreadsheetLog("Answered callback", String(response));
 };
 
@@ -90,7 +91,10 @@ const editMessageReplyMarkup = (
     // Convert the JavaScript object to a JSON string.
     payload: JSON.stringify(data),
   };
-  const response = callTelegramApi("editMessageReplyMarkup", options);
+  const response = callTelegramApi(
+    Telegram.Endpoint.editMessageReplyMarkup,
+    options
+  );
   spreadsheetLog("Edited message reply markup", String(response));
 };
 

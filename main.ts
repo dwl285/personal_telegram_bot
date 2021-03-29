@@ -1,5 +1,5 @@
 const doPost = (e) => {
-  const environment = new Environments().currentEnvironment();
+  const environment = Environments.currentEnvironment();
 
   const contents = JSON.parse(e.postData.getDataAsString());
   spreadsheetLog("Received post update", contents);
@@ -37,14 +37,14 @@ const doGet = (e) => {
 };
 
 function dailySummaries(): void {
-  const users = new Users().list;
+  const users = Users.list();
   users.forEach((u) => {
     sendDailySummaries(u);
   });
 }
 
 function dailyQuestions(): void {
-  const users = new Users().list;
+  const users = Users.list();
   users.forEach((u) => {
     askDailyQuestions(u);
   });

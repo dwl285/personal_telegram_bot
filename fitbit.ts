@@ -1,11 +1,8 @@
 // refresh the access token for a user
 function refreshFitbitTokens(user: User): void {
   // Get a new auth token
-
   const refreshToken = user.fitbit.refreshToken.getValue();
-
-  const fitbit = new FitbitUtils();
-  const clientParams = fitbit.clientParams.getValue();
+  const clientParams = FitbitUtils.clientParams.getValue();
   var headers = {
     Authorization: "Basic " + clientParams,
   };
@@ -14,10 +11,10 @@ function refreshFitbitTokens(user: User): void {
     refresh_token: refreshToken,
   };
   var params = {
-    method: "POST",
+    method: "post",
     headers: headers,
     payload: formData,
-  };
+  } as GoogleAppsScript.URL_Fetch.URLFetchRequestOptions;
 
   const refreshTokenUrl = "https://api.fitbit.com/oauth2/token";
   const response = UrlFetchApp.fetch(refreshTokenUrl, params);
@@ -35,7 +32,6 @@ function getDataForDateRange(
 ): any {
   // refresh tokens
   refreshFitbitTokens(user);
-  const fitbit = new FitbitUtils();
 
   // Make a GET request with auth
   const authToken = user.fitbit.accessToken;
@@ -43,11 +39,11 @@ function getDataForDateRange(
     Authorization: "Bearer " + authToken,
   };
   var params = {
-    method: "GET",
+    method: "get",
     headers: headers,
-  };
+  } as GoogleAppsScript.URL_Fetch.URLFetchRequestOptions;
 
-  const urlBase = fitbit.dateRangeUrls[type];
+  const urlBase = FitbitUtils.DateRangeUrl[type];
   const date = new DateUtils();
 
   const url = `${urlBase}/${date.dateToString(start_date)}/${date.dateToString(
@@ -71,7 +67,7 @@ function lastNDaysData(type: fitbitDataTypes, n: number, user: User): any {
 /* SLEEP */
 
 function lastNDaysAverageSleep(user: User, n: number): SleepData {
-  const sleep_data = lastNDaysData("sleep", n, user);
+  const sleep_data = lastNDaysData(fitbitDataTypes.sleep, n, user);
   const total_mins_asleep = sleep_data.sleep
     .map((r) => r.minutesAsleep)
     .reduce((a, b) => a + b);
@@ -88,7 +84,7 @@ function lastNDaysAverageSleep(user: User, n: number): SleepData {
 }
 
 function dailyFitbitSleepMessage(user: User): string {
-  const icon = new MessageUtils().icons.heart;
+  const icon = MessageUtils.icons.sleep;
   return [
     icon,
     `Yesterday: ${lastNDaysAverageSleep(user, 1).time_asleep_string}`,
@@ -101,7 +97,7 @@ function dailyFitbitSleepMessage(user: User): string {
 /* RESTING HEART RATE */
 
 function lastNDaysAverageHeartrate(user: User, n: number): HeartData {
-  const heart_data = lastNDaysData("heart", n, user);
+  const heart_data = lastNDaysData(fitbitDataTypes.heart, n, user);
   const total_hr = heart_data["activities-heart"]
     .map((r) => r.value.restingHeartRate)
     .filter((hr) => !!hr)
@@ -116,7 +112,7 @@ function lastNDaysAverageHeartrate(user: User, n: number): HeartData {
 }
 
 function dailyFitbitHeartrateMessage(user: User): string {
-  const icon = new MessageUtils().icons.heart;
+  const icon = MessageUtils.icons.heart;
   return [
     icon,
     `Yesterday: ${lastNDaysAverageHeartrate(user, 1).average_hr}`,
@@ -145,19 +141,19 @@ function stepStatsYTD(user: User): StepsData {
   const new_years_day_ly = date.dayLastYear(new_years_day);
   const new_years_eve_ly = new Date(new_years_day_ly.getFullYear(), 11, 31);
   const steps_data_ty = getDataForDateRange(
-    "steps",
+    fitbitDataTypes.steps,
     user,
     new_years_day,
     yesterday
   );
   const steps_data_ly_td = getDataForDateRange(
-    "steps",
+    fitbitDataTypes.steps,
     user,
     new_years_day_ly,
     yesterday_ly
   );
   const steps_data_ly_full = getDataForDateRange(
-    "steps",
+    fitbitDataTypes.steps,
     user,
     new_years_day_ly,
     new_years_eve_ly
@@ -186,7 +182,7 @@ function formatSteps(steps: number, dp = 0): string {
 }
 
 function dailyFitbitStepsMessage(user: User): string {
-  const icon = new MessageUtils().icons.heart;
+  const icon = MessageUtils.icons.steps;
   const d = stepStatsYTD(user);
   const projected_steps = (d.lyf.days * d.ty.steps) / d.ty.days;
   return [

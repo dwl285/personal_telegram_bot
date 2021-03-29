@@ -1,5 +1,5 @@
 function responseSummaryMessage(): string {
-  const data = getDataBQ("summary");
+  const data = getDataBQ(BQTableName.summaryRead);
 
   const cellLengths = [8, 5, 7, 6];
   var message =
@@ -43,7 +43,7 @@ function summaryFitbit(chatId: TelegramChatId, user: User): void {
 }
 
 function sendDailySummaries(user: User): void {
-  const environment = new Environments().currentEnvironment();
+  const environment = Environments.currentEnvironment();
   const chatId = environment.bot.chatId;
   summaryResponses(chatId);
   summaryChess(chatId, user);

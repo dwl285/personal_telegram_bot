@@ -1,174 +1,66 @@
-type EnvironmentName = "PRODUCTION" | "DEVELOPMENT";
+// spreadsheets
 
-// environments
-class Environment {
-  url: string;
-  name: EnvironmentName;
-  bot: Bot;
-  bqDatasetName: BQDatasetName;
-  answerLogSheet: Sheet;
-
-  constructor(
-    url: string,
-    name: EnvironmentName,
-    bot: Bot,
-    bqDatasetName: BQDatasetName,
-    answerLogSheet: Sheet
-  ) {
-    this.url = url;
-    this.name = name;
-    this.bot = bot;
-    this.bqDatasetName = bqDatasetName;
-    this.answerLogSheet = answerLogSheet;
-  }
-}
-
-type ScriptUrl =
-  | "https://script.google.com/macros/s/AKfycbxZJk6vRe80-6SPifMnfaKICF2V6nOjYdyVWwZg1Kb8yO6P5qlyaHLXRw/exec"
-  | "https://script.google.com/macros/s/AKfycbw508YXy8PZrpXLNoYc6doVKhA-l3iSb7XNvvYeDLtb/dev";
-
-class ScriptUrls {
-  prodUrl: ScriptUrl;
-  devUrl: ScriptUrl;
-  constructor() {
-    this.prodUrl =
-      "https://script.google.com/macros/s/AKfycbxZJk6vRe80-6SPifMnfaKICF2V6nOjYdyVWwZg1Kb8yO6P5qlyaHLXRw/exec";
-    this.devUrl =
-      "https://script.google.com/macros/s/AKfycbw508YXy8PZrpXLNoYc6doVKhA-l3iSb7XNvvYeDLtb/dev";
-  }
-}
-
-class Environments {
-  prod: Environment;
-  dev: Environment;
-
-  constructor() {
-    const urls = new ScriptUrls();
-    var bots = new Bots();
-    this.prod = new Environment(
-      urls.prodUrl,
-      "PRODUCTION",
-      bots.prod,
-      "telegram_prod",
-      new Sheet("Data")
-    );
-    this.dev = new Environment(
-      urls.devUrl,
-      "DEVELOPMENT",
-      bots.dev,
-      "telegram_dev",
-      new Sheet("DataDev")
-    );
-  }
-
-  currentEnvironment(): Environment {
-    const urls = new ScriptUrls();
-    const currentUrl = ScriptApp.getService().getUrl();
-    const options = {};
-    options[urls.prodUrl] = this.prod;
-    options[urls.devUrl] = this.dev;
-    return options[currentUrl];
-  }
-}
-
-type BotToken = string;
-
-class Bot {
-  name: string;
-  token: BotToken;
-  chatId: TelegramChatId;
-  constructor(name: string, token: BotToken, chatId: TelegramChatId) {
-    this.name = name;
-    this.token = token;
-    this.chatId = chatId;
-  }
-}
-
-class Bots {
-  prod: Bot;
-  dev: Bot;
-  constructor() {
-    this.prod = new Bot(
-      "dwl285_bot",
-      new Token("prodBotToken").getValue(),
-      -484842241
-    );
-    this.dev = new Bot(
-      "dwl285_dev_bot",
-      new Token("devBotToken").getValue(),
-      -417576688
-    );
-  }
-}
-
-// telegram
-type TelegramChatId = -484842241 | -417576688;
-
-type TelegramEndpoint =
-  | "sendMessage"
-  | "answerCallbackQuery"
-  | "editMessageReplyMarkup";
-
-class Telegram {
-  apiBaseUrl: string;
-  yesNoKeyboard: {};
-  constructor() {
-    this.apiBaseUrl = "https://api.telegram.org/bot";
-    this.yesNoKeyboard = {
-      inline_keyboard: [
-        [
-          { text: "🚫", callback_data: "0" },
-          { text: "✅", callback_data: "1" },
-        ],
-      ],
-    };
+class GSheet {
+  readonly name: string;
+  readonly spreadsheet: string;
+  constructor(sheetName: string) {
+    this.name = sheetName;
+    this.spreadsheet = "1WObtaVTWcNgyPTNCDtI09eIQwRCaKcUjQAivailWI_o";
   }
 }
 
 // tokens
 
-type TokenSheet = "FitbitTokens" | "Tokens";
-type TokenName =
-  | "accessTokenDan"
-  | "refreshTokenDan"
-  | "accessTokenEl"
-  | "refreshTokenEl"
-  | "prodBotToken"
-  | "devBotToken"
-  | "clientId"
-  | "clientSecret"
-  | "clientParams";
+enum TokenSheet {
+  FitbitTokens = "FitbitTokens",
+  Tokens = "Tokens",
+}
 
-type TokenType = "Fitbit" | "Regular";
+enum TokenName {
+  accessTokenDan = "accessTokenDan",
+  refreshTokenDan = "refreshTokenDan",
+  accessTokenEl = "accessTokenEl",
+  refreshTokenEl = "refreshTokenEl",
+  prodBotToken = "prodBotToken",
+  devBotToken = "devBotToken",
+  clientId = "clientId",
+  clientSecret = "clientSecret",
+  clientParams = "clientParams",
+}
+
+enum TokenType {
+  Fitbit,
+  Regular,
+}
 
 class Token {
-  name: string;
-  sheet: Sheet;
-  type: TokenType;
+  readonly name: string;
+  readonly sheet: GSheet;
+  readonly type: TokenType;
   constructor(name: TokenName) {
     this.name = name;
     const sheetName = {
-      accessTokenDan: "FitbitTokens",
-      refreshTokenDan: "FitbitTokens",
-      accessTokenEl: "FitbitTokens",
-      refreshTokenEl: "FitbitTokens",
-      clientParams: "FitbitTokens",
-      clientId: "FitbitTokens",
-      clientSecret: "FitbitTokens",
-      prodBotToken: "Tokens",
-      devBotToken: "Tokens",
+      accessTokenDan: TokenSheet.FitbitTokens,
+      refreshTokenDan: TokenSheet.FitbitTokens,
+      accessTokenEl: TokenSheet.FitbitTokens,
+      refreshTokenEl: TokenSheet.FitbitTokens,
+      clientParams: TokenSheet.FitbitTokens,
+      clientId: TokenSheet.FitbitTokens,
+      clientSecret: TokenSheet.FitbitTokens,
+      prodBotToken: TokenSheet.Tokens,
+      devBotToken: TokenSheet.Tokens,
     }[name];
-    this.sheet = new Sheet(sheetName);
+    this.sheet = new GSheet(sheetName);
     const type = {
-      accessTokenDan: "Fitbit",
-      refreshTokenDan: "Fitbit",
-      accessTokenEl: "Fitbit",
-      refreshTokenEl: "Fitbit",
-      clientParams: "Fitbit",
-      clientId: "Fitbit",
-      clientSecret: "Fitbit",
-      prodBotToken: "Regular",
-      devBotToken: "Regular",
+      accessTokenDan: TokenType.Fitbit,
+      refreshTokenDan: TokenType.Fitbit,
+      accessTokenEl: TokenType.Fitbit,
+      refreshTokenEl: TokenType.Fitbit,
+      clientParams: TokenType.Fitbit,
+      clientId: TokenType.Fitbit,
+      clientSecret: TokenType.Fitbit,
+      prodBotToken: TokenType.Regular,
+      devBotToken: TokenType.Regular,
     }[name] as TokenType;
     this.type = type;
   }
@@ -197,47 +89,62 @@ class Token {
   }
 }
 
-class Tokens {
-  list: Token[];
-  constructor() {
-    this.list = [
-      new Token("accessTokenDan"),
-      new Token("refreshTokenDan"),
-      new Token("accessTokenEl"),
-      new Token("refreshTokenEl"),
-      new Token("prodBotToken"),
-      new Token("devBotToken"),
-      new Token("clientId"),
-      new Token("clientSecret"),
-      new Token("clientParams"),
-    ];
+// telegram
+
+type BotToken = string;
+
+enum TelegramChatId {
+  prod = -484842241,
+  dev = -417576688,
+}
+
+class Bot {
+  readonly name: string;
+  readonly token: BotToken;
+  readonly chatId: TelegramChatId;
+  constructor(name: string, token: BotToken, chatId: TelegramChatId) {
+    this.name = name;
+    this.token = token;
+    this.chatId = chatId;
   }
 }
 
-// spreadsheets
+namespace Telegram {
+  export const apiBaseUrl = "https://api.telegram.org/bot";
+  export const yesNoKeyboard = {
+    inline_keyboard: [
+      [
+        { text: "🚫", callback_data: "0" },
+        { text: "✅", callback_data: "1" },
+      ],
+    ],
+  };
+  export enum Endpoint {
+    sendMessaege = "sendMessage",
+    answerCallbackQuery = "answerCallbackQuery",
+    editMessageReplyMarkup = "editMessageReplyMarkup",
+  }
 
-class Sheet {
-  name: string;
-  spreadsheet: string;
-  constructor(sheetName: string) {
-    this.name = sheetName;
-    this.spreadsheet = "1WObtaVTWcNgyPTNCDtI09eIQwRCaKcUjQAivailWI_o";
+  export namespace Bots {
+    export const prod = new Bot(
+      "dwl285_bot",
+      new Token(TokenName.prodBotToken).getValue(),
+      TelegramChatId.prod
+    );
+    export const dev = new Bot(
+      "dwl285_dev_bot",
+      new Token(TokenName.devBotToken).getValue(),
+      TelegramChatId.dev
+    );
   }
 }
 
 // fitbit
 
-type fitbitDataTypes = "sleep" | "heart" | "steps";
-
-type FitbitDateRangeUrl =
-  | "https://api.fitbit.com/1.2/user/-/sleep/date"
-  | "https://api.fitbit.com/1/user/-/activities/heart/date"
-  | "https://api.fitbit.com/1/user/-/activities/steps/date";
-
-interface FitbitDateRangeUrls {
-  sleep: FitbitDateRangeUrl;
-  heart: FitbitDateRangeUrl;
-  steps: FitbitDateRangeUrl;
+enum fitbitDataTypes {
+  sleep = "sleep",
+  heart = "heart",
+  steps = "steps",
 }
 
 interface SleepData {
@@ -262,48 +169,81 @@ interface StepsSummaryData {
 }
 
 class FitbitSettings {
-  refreshToken: Token;
-  accessToken: Token;
+  readonly refreshToken: Token;
+  readonly accessToken: Token;
   constructor(refreshTokenName: TokenName, accessTokenName: TokenName) {
     this.refreshToken = new Token(refreshTokenName);
     this.accessToken = new Token(accessTokenName);
   }
 }
 
-class FitbitUtils {
-  clientParams: Token;
-  clientId: Token;
-  clientSecret: Token;
-  dateRangeUrls: FitbitDateRangeUrls;
-  constructor() {
-    this.clientParams = new Token("clientParams");
-    this.clientId = new Token("clientId");
-    this.clientSecret = new Token("clientSecret");
-    this.dateRangeUrls = {
-      sleep: "https://api.fitbit.com/1.2/user/-/sleep/date",
-      heart: "https://api.fitbit.com/1/user/-/activities/heart/date",
-      steps: "https://api.fitbit.com/1/user/-/activities/steps/date",
-    };
+namespace FitbitUtils {
+  export const clientParams = new Token(TokenName.clientParams);
+  export const clientId = new Token(TokenName.clientId);
+  export const clientSecret = new Token(TokenName.clientSecret);
+  export enum DateRangeUrl {
+    sleep = "https://api.fitbit.com/1.2/user/-/sleep/date",
+    heart = "https://api.fitbit.com/1/user/-/activities/heart/date",
+    steps = "https://api.fitbit.com/1/user/-/activities/steps/date",
+  }
+}
+
+// possible chess.com game types
+enum ChessGameType {
+  daily = "daily",
+  rapid = "rapid",
+  blitz = "blitz",
+}
+
+class ChessComSettings {
+  readonly username: string;
+  readonly gameType: ChessGameType;
+  readonly gamesAtStartOfYear: number;
+  readonly gamesGoal: number;
+  constructor(
+    username: string,
+    gameType: ChessGameType,
+    gamesAtStartOfYear: number,
+    gamesGoal: number
+  ) {
+    this.username = username;
+    this.gameType = gameType;
+    this.gamesAtStartOfYear = gamesAtStartOfYear;
+    this.gamesGoal = gamesGoal;
   }
 }
 
 // BigQuery
 
-type BQTableName = "daily_questions" | "summary";
-type BQDatasetName = "telegram_prod" | "telegram_dev" | "telegram_analysis";
-type BQProjectId = "dan-playground-285";
+declare var BigQuery: GoogleAppsScript.Bigquery;
+
+enum BQTableName {
+  questionWrite = "daily_questions",
+  summaryRead = "summary",
+}
+
+enum BQDatasetName {
+  prodWrite = "telegram_prod",
+  devWrite = "telegram_dev",
+  prodRead = "telegram_analysis",
+}
+
+enum BQProjectId {
+  danPlayground = "dan-playground-285",
+}
+
 interface BQResults {
   fields: string[];
   rows: any[];
 }
 
 class BQTable {
-  name: BQTableName;
-  dataset: BQDatasetName;
-  projectId: BQProjectId;
-  fullyQualifiedName: string;
+  readonly name: BQTableName;
+  readonly dataset: BQDatasetName;
+  readonly projectId: BQProjectId;
+  readonly fullyQualifiedName: string;
   constructor(name: BQTableName) {
-    const inputDataset = new Environments().currentEnvironment().bqDatasetName;
+    const inputDataset = Environments.currentEnvironment().bqDatasetName;
     const analysisDataset = "telegram_analysis";
     const dataset = {
       daily_questions: inputDataset,
@@ -311,45 +251,50 @@ class BQTable {
     }[name] as BQDatasetName;
     this.name = name;
     this.dataset = dataset;
-    this.projectId = "dan-playground-285";
+    this.projectId = BQProjectId.danPlayground;
     this.fullyQualifiedName = `${this.projectId}.${this.dataset}.${this.name}`;
   }
 }
 
 // Questions
 
-type QuestionType =
-  | "CHESS"
-  | "READING"
-  | "DRINKING"
-  | "EXERCISE"
-  | "PIANO"
-  | undefined;
-type QuestionString =
-  | "Did you drink"
-  | "Did you play the piano"
-  | "Did you play chess"
-  | "Did you exercise"
-  | "Did you read";
+type QuestionResponses = QuestionResponse[];
+
+enum QuestionType {
+  Chess = "CHESS",
+  Reading = "READING",
+  Drinking = "DRINKING",
+  Exercise = "EXERCISE",
+  Piano = "PIANO",
+}
+
+enum QuestionString {
+  Drinking = "Did you drink",
+  Piano = "Did you play the piano",
+  Chess = "Did you play chess",
+  Exercise = "Did you exercise",
+  Reading = "Did you read",
+}
+
 interface Question {
   type: QuestionType;
   string: QuestionString;
 }
+
 interface QuestionResponse {
   date: string;
   user: string;
   question: string;
   response: string;
 }
-type QuestionResponses = QuestionResponse[];
 
 // Users
 
 class User {
-  name: string;
-  questions: Question[];
-  chess: ChessComSettings;
-  fitbit: FitbitSettings;
+  readonly name: string;
+  readonly questions: Question[];
+  readonly chess: ChessComSettings;
+  readonly fitbit: FitbitSettings;
   constructor(
     name: string,
     questions: Question[],
@@ -365,82 +310,118 @@ class User {
   }
 }
 
-class Users {
-  list: User[];
-  constructor() {
+namespace Users {
+  export function list(): User[] {
     const dan = new User(
       "dan",
       [
         {
-          type: "CHESS",
-          string: "Did you play chess",
+          type: QuestionType.Chess,
+          string: QuestionString.Chess,
         },
         {
-          type: "DRINKING",
-          string: "Did you drink",
+          type: QuestionType.Drinking,
+          string: QuestionString.Drinking,
         },
         {
-          type: "PIANO",
-          string: "Did you play the piano",
+          type: QuestionType.Piano,
+          string: QuestionString.Piano,
         },
         {
-          type: "EXERCISE",
-          string: "Did you exercise",
+          type: QuestionType.Exercise,
+          string: QuestionString.Exercise,
         },
         {
-          type: "READING",
-          string: "Did you read",
+          type: QuestionType.Reading,
+          string: QuestionString.Reading,
         },
       ],
-      new ChessComSettings("dwl285", "rapid", 15, 200),
-      new FitbitSettings("refreshTokenDan", "accessTokenDan")
+      new ChessComSettings("dwl285", ChessGameType.rapid, 15, 200),
+      new FitbitSettings(TokenName.refreshTokenDan, TokenName.accessTokenDan)
     );
-    this.list = [dan];
+    return [dan];
   }
 }
 
-// possible chess.com game types
-type GameType = "daily" | "rapid" | "blitz";
+// scripts
 
-class ChessComSettings {
-  username: string;
-  gameType: GameType;
-  gamesAtStartOfYear: number;
-  gamesGoal: number;
+enum ScriptUrl {
+  Prod = "https://script.google.com/macros/s/AKfycbxZJk6vRe80-6SPifMnfaKICF2V6nOjYdyVWwZg1Kb8yO6P5qlyaHLXRw/exec",
+  Dev = "https://script.google.com/macros/s/AKfycbw508YXy8PZrpXLNoYc6doVKhA-l3iSb7XNvvYeDLtb/dev",
+}
+
+namespace ScriptUrls {
+  export const prod = ScriptUrl.Prod;
+  export const dev = ScriptUrl.Dev;
+}
+
+// environments
+
+enum EnvironmentName {
+  Prod,
+  Dev,
+}
+
+class Environment {
+  readonly url: string;
+  readonly name: EnvironmentName;
+  readonly bot: Bot;
+  readonly bqDatasetName: BQDatasetName;
+  readonly answerLogSheet: GSheet;
+
   constructor(
-    username: string,
-    gameType: GameType,
-    gamesAtStartOfYear: number,
-    gamesGoal: number
+    url: string,
+    name: EnvironmentName,
+    bot: Bot,
+    bqDatasetName: BQDatasetName,
+    answerLogSheet: GSheet
   ) {
-    // the username (for us in calling the chess.com API)
-    this.username = username;
-    // the game type the user would like to track
-    this.gameType = gameType;
-    // the number of games the user had played at the start of the year
-    this.gamesAtStartOfYear = gamesAtStartOfYear;
-    // the goal for number of games played by end of year
-    this.gamesGoal = gamesGoal;
+    this.url = url;
+    this.name = name;
+    this.bot = bot;
+    this.bqDatasetName = bqDatasetName;
+    this.answerLogSheet = answerLogSheet;
+  }
+}
+
+namespace Environments {
+  export const prod = new Environment(
+    ScriptUrls.prod,
+    EnvironmentName.Prod,
+    Telegram.Bots.prod,
+    BQDatasetName.prodWrite,
+    new GSheet("Data")
+  );
+  export const dev = new Environment(
+    ScriptUrls.dev,
+    EnvironmentName.Dev,
+    Telegram.Bots.dev,
+    BQDatasetName.devWrite,
+    new GSheet("DataDev")
+  );
+
+  export function currentEnvironment(): Environment {
+    const currentUrl = ScriptApp.getService().getUrl();
+    const options = {};
+    options[ScriptUrls.prod] = this.prod;
+    options[ScriptUrls.dev] = this.dev;
+    return options[currentUrl];
+  }
+
+  export function list(): Environment[] {
+    return [prod, dev];
   }
 }
 
 // utils
 
-class MessageUtils {
-  icons: {
-    chess: string;
-    steps: string;
-    heart: string;
-    sleep: string;
+namespace MessageUtils {
+  export const icons = {
+    chess: `♟️`,
+    steps: `🚶‍♂️`,
+    heart: `💓`,
+    sleep: `😴`,
   };
-  constructor() {
-    this.icons = {
-      chess: `♟️`,
-      steps: `🚶‍♂️`,
-      heart: `💓`,
-      sleep: `😴`,
-    };
-  }
 }
 
 class DateUtils {
