@@ -27,7 +27,7 @@ function responseSummaryMessage(): string {
   return `<pre> ${message} </pre>`;
 }
 
-function sendOverallSummary(chatId: TelegramChatId): void {
+function sendResponseSummary(chatId: TelegramChatId): void {
   const message = responseSummaryMessage();
   sendMessage(chatId, message);
 }
@@ -45,7 +45,7 @@ function sendFitbitSummary(chatId: TelegramChatId, user: User): void {
 function sendDailySummaries(user: User): void {
   const environment = Environments.currentEnvironment();
   const chatId = environment.bot.chatId;
-  sendOverallSummary(chatId);
+  sendResponseSummary(chatId);
   sendChessSummary(chatId, user);
   sendFitbitSummary(chatId, user);
 }

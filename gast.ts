@@ -19,9 +19,38 @@ function initiateGast() {
   return test;
 }
 
-function testWrapper(fn: Function): string {
+function testWrapper(fn: Function): { succeeded: number; failed: number } {
   var test = initiateGast();
-  fn(test);
-  const message = `${test.totalSucceed()} failed, ${test.totalSucceed()} passed.`;
-  return message;
+  test = fn(test);
+  return {
+    succeeded: test.totalSucceed(),
+    failed: test.totalFailed(),
+  };
+}
+
+function runTests(any[]): void {
+  const testResults = [
+    bqTests,
+    chessTests,
+    classTests,
+    fitbitTests,
+    propertiesTests,
+    questionsTests,
+    spreadsheetTests,
+    summaryTests,
+    telegramTests,
+    utilsTests,
+  ]
+    .map((fn) => fn())
+    .reduce((out, i) => {
+      out["succeeded"] += i.succeeded;
+      out["failed"] += i.failed;
+      return out;
+    });
+
+  if (testResults.failed > 0) {
+    throw `${testResults.failed} tests failed`;
+  } else {
+    console.log("All tests passed");
+  }
 }

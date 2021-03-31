@@ -1,18 +1,20 @@
 function runAllTests(): void {
-  bqTests();
-  chessTests();
-  classTests();
-  fitbitTests();
-  propertiesTests();
-  questionsTests();
-  spreadsheetTests();
-  summaryTests();
-  // telegramTests();
-  utilsTests();
+  runTests([
+    bqTests,
+    chessTests,
+    classTests,
+    fitbitTests,
+    propertiesTests,
+    questionsTests,
+    spreadsheetTests,
+    summaryTests,
+    telegramTests,
+    utilsTests,
+  ]);
 }
 
-function bqTests(): void {
-  testWrapper((test) => {
+function bqTests(): any {
+  return testWrapper((test) => {
     const testUser = Users.list()[0];
 
     test("insertDataBQ", (t) => {
@@ -36,11 +38,12 @@ function bqTests(): void {
         "Successfully read data from BQ"
       );
     });
+    return test;
   });
 }
 
-function chessTests(): void {
-  testWrapper((test) => {
+function chessTests(): any {
+  return testWrapper((test) => {
     const testUser = Users.list()[0];
 
     test("getChessCOMData", (t) => {
@@ -69,11 +72,12 @@ function chessTests(): void {
         "Chess message is roughly the right length"
       );
     });
+    return test;
   });
 }
 
-function classTests(): void {
-  testWrapper((test) => {
+function classTests(): any {
+  return testWrapper((test) => {
     test("getDailyChessMessage", (t) => {
       const token = new Token(TokenName.testToken);
       t.ok(token.getValue(), "tokens value exists");
@@ -84,11 +88,12 @@ function classTests(): void {
         "tokens value was correctly set by setValue"
       );
     });
+    return test;
   });
 }
 
-function fitbitTests(): void {
-  testWrapper((test) => {
+function fitbitTests(): any {
+  return testWrapper((test) => {
     const testUser = Users.list()[0];
 
     test("getNewFitbitAccessToken", (t) => {
@@ -151,11 +156,12 @@ function fitbitTests(): void {
         "Successfully created steps message"
       );
     });
+    return test;
   });
 }
 
-function propertiesTests(): void {
-  testWrapper((test) => {
+function propertiesTests(): any {
+  return testWrapper((test) => {
     const testUser = Users.list()[0];
     const testDataType: ScriptDataType = ScriptDataType.Summary;
     const randomString = Math.random().toString(36);
@@ -171,11 +177,12 @@ function propertiesTests(): void {
         "successfully set and got script property"
       );
     });
+    return test;
   });
 }
 
-function questionsTests(): void {
-  testWrapper((test) => {
+function questionsTests(): any {
+  return testWrapper((test) => {
     test("getQuestionType", (t) => {
       const type = getQuestionType(QuestionString.Drinking);
       t.equal(
@@ -202,33 +209,36 @@ function questionsTests(): void {
         "bad streak message is correct chess"
       );
     });
+    return test;
   });
 }
 
-function spreadsheetTests(): void {
-  testWrapper((test) => {
+function spreadsheetTests(): any {
+  return testWrapper((test) => {
     test("spreadsheetLog", (t) => {
       t.notThrow(
         () => spreadsheetLog("unit tester", "unit testing"),
         "spreadhseet logger is working"
       );
     });
+    return test;
   });
 }
 
-function summaryTests(): void {
-  testWrapper((test) => {
+function summaryTests(): any {
+  return testWrapper((test) => {
     test("responseSummaryMessage", (t) => {
       t.ok(
         responseSummaryMessage().length > 20,
         "response summary message working as expected"
       );
     });
+    return test;
   });
 }
 
-function telegramTests(): void {
-  testWrapper((test) => {
+function telegramTests(): any {
+  return testWrapper((test) => {
     // toDO: work out why this fails
     test("sendMessage", (t) => {
       t.notThrow(
@@ -248,11 +258,12 @@ function telegramTests(): void {
         "pad spaces creates a string of the correct length"
       );
     });
+    return test;
   });
 }
 
-function utilsTests(): void {
-  testWrapper((test) => {
+function utilsTests(): any {
+  return testWrapper((test) => {
     test("daysYTD", (t) => {
       const daysYTD = new DateUtils().daysYTD(2021);
       t.ok(Number.isInteger(daysYTD), "days YTD is a valid integer");
@@ -261,5 +272,6 @@ function utilsTests(): void {
     test("icons", (t) => {
       t.ok(MessageUtils.icons.chess, "chess icon exists");
     });
+    return test;
   });
 }
