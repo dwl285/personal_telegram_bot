@@ -467,3 +467,19 @@ class DateUtils {
     return Utilities.formatDate(date, "Europe/London", "yyyy-MM-dd");
   }
 }
+
+// properties
+
+enum ScriptDataType {
+  Summary,
+}
+
+interface scriptPropertyKey {
+  user: User;
+  type: ScriptDataType;
+}
+
+interface scriptPropertyData {
+  timestampMillis: number;
+  data: any;
+}

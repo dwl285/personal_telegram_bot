@@ -2,7 +2,7 @@
 
 name: Run unit tests
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on: pull_request
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -20,11 +20,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: '12'
+          node-version: "12"
 
       - name: Install Clasp
         run: npm install -g @google/clasp
-        
+
       - name: Decrypt Dataform credentials
         run: ./.decrypt_credentials.sh
         env:
@@ -32,11 +32,11 @@ jobs:
 
       - name: Move global clasp creds
         run: cp .globalclasprc.json $HOME/.clasprc.json
-          
+
       - name: clasp push
         # should only require global auth
         run: clasp push
-          
+
       - name: Run unit tests
         # requires local auth
-        run: clasp run gastTestRunner
+        run: clasp run runAllTests

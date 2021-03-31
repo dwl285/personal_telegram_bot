@@ -18,3 +18,10 @@ function initiateGast() {
 
   return test;
 }
+
+function testWrapper(fn: Function): string {
+  var test = initiateGast();
+  fn(test);
+  const message = `${test.totalSucceed()} failed, ${test.totalSucceed()} passed.`;
+  return message;
+}
