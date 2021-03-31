@@ -1,4 +1,7 @@
-function getScriptPropetyKey(dataType: ScriptDataType, user: User): string {
+function getScriptPropetyKey(
+  dataType: ScriptDataType | BQTableName,
+  user: User
+): string {
   const key: scriptPropertyKey = {
     user: user,
     type: dataType,
@@ -8,7 +11,7 @@ function getScriptPropetyKey(dataType: ScriptDataType, user: User): string {
 }
 
 function setScriptProperty(
-  dataType: ScriptDataType,
+  dataType: ScriptDataType | BQTableName,
   user: User,
   data: any
 ): void {
@@ -25,7 +28,7 @@ function setScriptProperty(
 }
 
 function getScriptProperty(
-  dataType: ScriptDataType,
+  dataType: ScriptDataType | BQTableName,
   user: User
 ): scriptPropertyData {
   const stringifiedKey: string = getScriptPropetyKey(dataType, user);
@@ -34,8 +37,27 @@ function getScriptProperty(
   return JSON.parse(stringData);
 }
 
-function deleteScriptProperty(dataType: ScriptDataType, user: User): void {
+function deleteScriptProperty(
+  dataType: ScriptDataType | BQTableName,
+  user: User
+): void {
   const stringifiedKey: string = getScriptPropetyKey(dataType, user);
   var scriptProperties = PropertiesService.getScriptProperties();
   var stringData = scriptProperties.deleteProperty(stringifiedKey);
+}
+
+function getScriptPropertyCacheStatus(
+  dataType: ScriptDataType | BQTableName,
+  user: User,
+  maxStalenessMins: number
+): CacheStatus {
+  const currentValue = getScriptProperty(dataType, user);
+  const timeSinceLastRefresh = !!currentValue
+    ? (Date.now() - currentValue.timestampMillis) / (1000 * 60)
+    : maxStalenessMins + 1;
+  if (timeSinceLastRefresh > maxStalenessMins) {
+    return CacheStatus.Stale;
+  } else {
+    return CacheStatus.Fresh;
+  }
 }

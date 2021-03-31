@@ -64,3 +64,24 @@ function getDataBQ(tableName: BQTableName): BQResults {
 
   return { fields: fields, rows: data };
 }
+
+function getDataBQIFStale(
+  tableName: BQTableName,
+  user: User,
+  maxStalenessMins: number
+): BQResults {
+  const cacheStatus = getScriptPropertyCacheStatus(
+    tableName,
+    user,
+    maxStalenessMins
+  );
+
+  if (cacheStatus === CacheStatus.Stale) {
+    const data = getDataBQ(tableName);
+    setScriptProperty(tableName, user, data);
+    return data;
+  } else {
+    const property = getScriptProperty(tableName, user);
+    return property.data;
+  }
+}

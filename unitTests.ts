@@ -38,6 +38,14 @@ function bqTests(): any {
         "Successfully read data from BQ"
       );
     });
+
+    test("getDataBQIFStale", (t) => {
+      t.ok(
+        getDataBQIFStale(BQTableName.summaryRead, testUser, 60).fields.length >
+          0,
+        "Successfully read data from BQ if stale"
+      );
+    });
     return test;
   });
 }
@@ -163,7 +171,7 @@ function fitbitTests(): any {
 function propertiesTests(): any {
   return testWrapper((test) => {
     const testUser = Users.list()[0];
-    const testDataType: ScriptDataType = ScriptDataType.Summary;
+    const testDataType = BQTableName.summaryRead;
     const randomString = Math.random().toString(36);
     const testData = { testString: randomString };
     setScriptProperty(testDataType, testUser, testData);
@@ -183,6 +191,7 @@ function propertiesTests(): any {
 
 function questionsTests(): any {
   return testWrapper((test) => {
+    const testUser = Users.list()[0];
     test("getQuestionType", (t) => {
       const type = getQuestionType(QuestionString.Drinking);
       t.equal(
@@ -193,7 +202,7 @@ function questionsTests(): any {
     });
 
     test("getStreaks", (t) => {
-      const streak_data = getStreaks(QuestionType.Chess);
+      const streak_data = getStreaks(QuestionType.Chess, testUser);
       t.ok(streak_data.streakType, "streakType exists");
       t.ok(streak_data.streakLength, "streakLength exists");
     });
@@ -227,9 +236,10 @@ function spreadsheetTests(): any {
 
 function summaryTests(): any {
   return testWrapper((test) => {
+    const testUser = Users.list()[0];
     test("responseSummaryMessage", (t) => {
       t.ok(
-        responseSummaryMessage().length > 20,
+        responseSummaryMessage(testUser).length > 20,
         "response summary message working as expected"
       );
     });

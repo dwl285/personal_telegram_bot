@@ -28,19 +28,8 @@ function testWrapper(fn: Function): { succeeded: number; failed: number } {
   };
 }
 
-function runTests(any[]): void {
-  const testResults = [
-    bqTests,
-    chessTests,
-    classTests,
-    fitbitTests,
-    propertiesTests,
-    questionsTests,
-    spreadsheetTests,
-    summaryTests,
-    telegramTests,
-    utilsTests,
-  ]
+function runTests(tests: any[]): string {
+  const testResults = tests
     .map((fn) => fn())
     .reduce((out, i) => {
       out["succeeded"] += i.succeeded;
@@ -51,6 +40,6 @@ function runTests(any[]): void {
   if (testResults.failed > 0) {
     throw `${testResults.failed} tests failed`;
   } else {
-    console.log("All tests passed");
+    return "All tests passed";
   }
 }

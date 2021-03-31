@@ -1,3 +1,5 @@
+// types: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/node-telegram-bot-api/index.d.ts
+
 const setWebhook = (): void => {
   Environments.list().map((e) => {
     const url = Telegram.apiBaseUrl + e.bot.token + "/setWebhook?url=" + e.url;

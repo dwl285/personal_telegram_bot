@@ -1,5 +1,5 @@
-function responseSummaryMessage(): string {
-  const data = getDataBQ(BQTableName.summaryRead);
+function responseSummaryMessage(user: User): string {
+  const data = getDataBQIFStale(BQTableName.summaryRead, user, 60);
 
   const cellLengths = [8, 5, 7, 6];
   var message =
@@ -27,8 +27,8 @@ function responseSummaryMessage(): string {
   return `<pre> ${message} </pre>`;
 }
 
-function sendResponseSummary(chatId: TelegramChatId): void {
-  const message = responseSummaryMessage();
+function sendResponseSummary(chatId: TelegramChatId, user: User): void {
+  const message = responseSummaryMessage(user);
   sendMessage(chatId, message);
 }
 
@@ -45,7 +45,7 @@ function sendFitbitSummary(chatId: TelegramChatId, user: User): void {
 function sendDailySummaries(user: User): void {
   const environment = Environments.currentEnvironment();
   const chatId = environment.bot.chatId;
-  sendResponseSummary(chatId);
+  sendResponseSummary(chatId, user);
   sendChessSummary(chatId, user);
   sendFitbitSummary(chatId, user);
 }
