@@ -12,8 +12,8 @@ function getQuestionType(question: string): QuestionType {
     : undefined;
 }
 
-function getStreaks(question_type: QuestionType): any {
-  const dataRaw = getDataBQ(BQTableName.summaryRead);
+function getStreaks(question_type: QuestionType, user: User): any {
+  const dataRaw = getDataBQIFStale(BQTableName.summaryRead, user, 60);
   const data = Object.create({});
   dataRaw.rows.forEach((a) => {
     var row = Object.create({});
@@ -67,4 +67,23 @@ function recordResponse(
     { date: date, user: user, question: question, response: response },
   ];
   insertDataBQ(data, BQTableName.questionWrite);
+}
+
+function handleQuestionReponse(contents: any): void {
+  const callbackQueryId = contents.callback_query.id;
+  const usersChocie = contents.callback_query.data;
+  const message = contents.callback_query.message;
+  const responderUserId = contents.callback_query.from.id;
+  const originalQuestion = message.text;
+  const chatroomId = message.chat.id;
+
+  recordResponse(responderUserId, originalQuestion, usersChocie);
+  answerCallback(callbackQueryId, "Ack");
+  // TODO: Fix this
+  const user = Users.getUserWithTelegramId(responderUserId);
+
+  const questionType = getQuestionType(originalQuestion);
+  const streakData = getStreaks(questionType, user);
+  const streakMessage = createStreakMessage(streakData, questionType);
+  sendMessage(chatroomId, streakMessage);
 }

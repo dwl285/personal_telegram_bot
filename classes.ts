@@ -103,6 +103,13 @@ enum TelegramChatId {
   dev = -417576688,
 }
 
+class TelegramSettings {
+  readonly userId: number;
+  constructor(userId: number) {
+    this.userId = userId;
+  }
+}
+
 class Bot {
   readonly name: string;
   readonly token: BotToken;
@@ -300,11 +307,13 @@ class User {
   readonly questions: Question[];
   readonly chess: ChessComSettings;
   readonly fitbit: FitbitSettings;
+  readonly telegram: TelegramSettings;
   constructor(
     name: string,
     questions: Question[],
     chessComSettings: ChessComSettings,
-    fitbit: FitbitSettings
+    fitbit: FitbitSettings,
+    telegram: TelegramSettings
   ) {
     // the users name
     this.name = name;
@@ -312,6 +321,7 @@ class User {
     // the users ChessComSettings (a class)
     this.chess = chessComSettings;
     this.fitbit = fitbit;
+    this.telegram = telegram;
   }
 }
 
@@ -342,9 +352,14 @@ namespace Users {
         },
       ],
       new ChessComSettings("dwl285", ChessGameType.rapid, 15, 200),
-      new FitbitSettings(TokenName.refreshTokenDan, TokenName.accessTokenDan)
+      new FitbitSettings(TokenName.refreshTokenDan, TokenName.accessTokenDan),
+      new TelegramSettings(1446748464)
     );
     return [dan];
+  }
+  export function getUserWithTelegramId(telegramId: number): User {
+    const users = Users.list();
+    return users.find((u) => u.telegram.userId === telegramId);
   }
 }
 
@@ -466,4 +481,25 @@ class DateUtils {
   dateToString(date: Date) {
     return Utilities.formatDate(date, "Europe/London", "yyyy-MM-dd");
   }
+}
+
+// properties
+
+enum ScriptDataType {
+  Test,
+}
+
+interface scriptPropertyKey {
+  user: User;
+  type: ScriptDataType | BQTableName;
+}
+
+interface scriptPropertyData {
+  timestampMillis: number;
+  data: any;
+}
+
+enum CacheStatus {
+  Stale,
+  Fresh,
 }
