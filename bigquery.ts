@@ -62,7 +62,15 @@ function getDataBQ(tableName: BQTableName): BQResults {
     }
   }
 
-  return { fields: fields, rows: data };
+  const tempData = { fields: fields, rows: data };
+  const returnData = tempData.rows.map(function (row) {
+    const rowOut = {};
+    tempData.fields.map((f) => {
+      rowOut[f] = row[tempData.fields.indexOf(f)];
+    });
+    return rowOut;
+  });
+  return returnData;
 }
 
 function getDataBQIFStale(

@@ -12,27 +12,6 @@ function getQuestionType(question: string): QuestionType {
     : undefined;
 }
 
-function getStreaks(question_type: QuestionType, user: User): any {
-  const dataRaw = getDataBQIFStale(BQTableName.summaryRead, user, 60);
-  const data = Object.create({});
-  dataRaw.rows.forEach((a) => {
-    var row = Object.create({});
-    row.streakType = a[dataRaw.fields.indexOf("current_streak_type")];
-    row.streakLength = a[dataRaw.fields.indexOf("current_streak_length")];
-    data[a[0]] = row;
-  });
-  return data[question_type];
-}
-
-function createStreakMessage(
-  streakData: any,
-  question_type: QuestionType
-): string {
-  return streakData.streakType === "0"
-    ? `${question_type}: Oh no, it's been ${streakData.streakLength} days, get back on it!`
-    : `${question_type}: Way to go, you're on a ${streakData.streakLength} day streak!`;
-}
-
 function askYesNoYesterday(chatId: TelegramChatId, question: Question): void {
   const weekdayAndDate = new DateUtils().weekdayAndDate();
   const questionText = `${question.string} yesterday, ${weekdayAndDate}?`;
@@ -67,6 +46,33 @@ function recordResponse(
     { date: date, user: user, question: question, response: response },
   ];
   insertDataBQ(data, BQTableName.questionWrite);
+}
+
+// fields: [ 'date_answered', 'user', 'question_type', 'answer' ],\n
+// rows: \n   [ [ '2021-01-06', 'Dan', 'READING', 'NO' ],\n     [ '2021-01-17', 'Dan', 'DRINKING', 'NO' ],\n
+//  [ '2021-01-19', 'Dan', 'DRINKING', 'NO' ],\n
+// [ '2021-01-27', 'Dan', 'DRINKING', 'NO' ],\n
+// [ '2021-01-13', 'Dan', 'EXERCISE', 'NO' ],\n
+
+// TODO: needs finishing
+function calculateStreaks(user = Users.list()[0]) {
+  const data = getDataBQIFStale(BQTableName.questionRead, user, 60);
+  console.log(data);
+}
+
+function getStreaks(question_type: QuestionType, user: User): any {
+  const data = getDataBQIFStale(BQTableName.summaryRead, user, 60);
+
+  return data.find((r) => r.question_type === question_type);
+}
+
+function createStreakMessage(
+  streakData: any,
+  question_type: QuestionType
+): string {
+  return streakData.streakType === "0"
+    ? `${question_type}: Oh no, it's been ${streakData.streakLength} days, get back on it!`
+    : `${question_type}: Way to go, you're on a ${streakData.streakLength} day streak!`;
 }
 
 function handleQuestionReponse(contents: any): void {

@@ -1,10 +1,6 @@
 const doPost = (e: GoogleAppsScript.Events.DoPost) => {
   const contents = JSON.parse(e.postData.contents);
   spreadsheetLog("Received post update", contents);
-  spreadsheetLog(
-    "Received post update: user id",
-    contents.callback_query.from.id
-  );
 
   // handle responses to the survey
   if ("callback_query" in contents) {

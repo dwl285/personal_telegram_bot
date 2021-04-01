@@ -231,6 +231,7 @@ declare var BigQuery: GoogleAppsScript.Bigquery;
 
 enum BQTableName {
   questionWrite = "daily_questions",
+  questionRead = "daily_answers",
   summaryRead = "summary",
 }
 
@@ -244,10 +245,24 @@ enum BQProjectId {
   danPlayground = "dan-playground-285",
 }
 
-interface BQResults {
-  fields: string[];
-  rows: any[];
+interface DailyAnswers {
+  date_answered: string;
+  user: string;
+  question_type: string;
+  answer: string;
 }
+
+interface Summary {
+  question_type: string;
+  answers: string;
+  good_days: string;
+  projected_good_days: string;
+  percent_answered: string;
+  current_streak_type: string;
+  current_streak_length: string;
+}
+
+type BQResults = DailyAnswers[] | Summary[] | any[];
 
 class BQTable {
   readonly name: BQTableName;
@@ -259,6 +274,7 @@ class BQTable {
     const analysisDataset = "telegram_analysis";
     const dataset = {
       daily_questions: inputDataset,
+      daily_answers: analysisDataset,
       summary: analysisDataset,
     }[name] as BQDatasetName;
     this.name = name;

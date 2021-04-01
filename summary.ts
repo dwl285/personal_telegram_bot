@@ -1,5 +1,5 @@
 function responseSummaryMessage(user: User): string {
-  const data = getDataBQIFStale(BQTableName.summaryRead, user, 60);
+  const data: BQResults = getDataBQIFStale(BQTableName.summaryRead, user, 60);
 
   const cellLengths = [8, 5, 7, 6];
   var message =
@@ -9,16 +9,19 @@ function responseSummaryMessage(user: User): string {
     padSpaces("🎯", cellLengths[3]) +
     "\n";
 
-  message += data.rows
-    .sort((a, b) => b[2] - a[2])
+  message += data
+    .sort((a, b) => parseInt(b.good_days) - parseInt(a.good_days))
     .map((row, i) => {
-      var category = padSpaces(row[0], cellLengths[0]);
-      var goodDays = padSpaces(row[2], cellLengths[1]);
+      var category = padSpaces(row.question_type, cellLengths[0]);
+      var goodDays = padSpaces(row.good_days, cellLengths[1]);
       var projectedDays = padSpaces(
-        parseFloat(row[3]).toFixed(0),
+        parseFloat(row.projected_good_days).toFixed(0),
         cellLengths[2]
       );
-      var percentAnswered = padSpaces(`${100 * row[4]}%`, cellLengths[3]);
+      var percentAnswered = padSpaces(
+        `${100 * parseInt(row.percent_answered)}%`,
+        cellLengths[3]
+      );
 
       return category + goodDays + projectedDays + percentAnswered;
     })

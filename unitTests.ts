@@ -34,15 +34,14 @@ function bqTests(): any {
 
     test("getDataBQ", (t) => {
       t.ok(
-        getDataBQ(BQTableName.summaryRead).fields.length > 0,
+        getDataBQ(BQTableName.summaryRead).length > 0,
         "Successfully read data from BQ"
       );
     });
 
     test("getDataBQIFStale", (t) => {
       t.ok(
-        getDataBQIFStale(BQTableName.summaryRead, testUser, 60).fields.length >
-          0,
+        getDataBQIFStale(BQTableName.summaryRead, testUser, 60).length > 0,
         "Successfully read data from BQ if stale"
       );
     });
@@ -203,8 +202,8 @@ function questionsTests(): any {
 
     test("getStreaks", (t) => {
       const streak_data = getStreaks(QuestionType.Chess, testUser);
-      t.ok(streak_data.streakType, "streakType exists");
-      t.ok(streak_data.streakLength, "streakLength exists");
+      t.ok(streak_data.current_streak_type, "streakType exists");
+      t.ok(streak_data.current_streak_length, "streakLength exists");
     });
 
     test("createStreakMessage", (t) => {
