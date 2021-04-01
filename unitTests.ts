@@ -202,8 +202,8 @@ function questionsTests(): any {
 
     test("getStreaks", (t) => {
       const streak_data = getStreaks(QuestionType.Chess, testUser);
-      t.ok(streak_data.current_streak_type, "streakType exists");
-      t.ok(streak_data.current_streak_length, "streakLength exists");
+      t.ok(streak_data.streakType, "streakType exists");
+      t.ok(streak_data.streakLength, "streakLength exists");
     });
 
     test("createStreakMessage", (t) => {

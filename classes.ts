@@ -304,9 +304,12 @@ enum QuestionString {
   Reading = "Did you read",
 }
 
+type QuestionAnswer = "YES" | "NO";
+
 interface Question {
   type: QuestionType;
   string: QuestionString;
+  positiveResponse: QuestionAnswer;
 }
 
 interface QuestionResponse {
@@ -349,22 +352,27 @@ namespace Users {
         {
           type: QuestionType.Chess,
           string: QuestionString.Chess,
+          positiveResponse: "YES",
         },
         {
           type: QuestionType.Drinking,
           string: QuestionString.Drinking,
+          positiveResponse: "NO",
         },
         {
           type: QuestionType.Piano,
           string: QuestionString.Piano,
+          positiveResponse: "YES",
         },
         {
           type: QuestionType.Exercise,
           string: QuestionString.Exercise,
+          positiveResponse: "YES",
         },
         {
           type: QuestionType.Reading,
           string: QuestionString.Reading,
+          positiveResponse: "YES",
         },
       ],
       new ChessComSettings("dwl285", ChessGameType.rapid, 15, 200),

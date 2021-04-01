@@ -48,22 +48,39 @@ function recordResponse(
   insertDataBQ(data, BQTableName.questionWrite);
 }
 
-// fields: [ 'date_answered', 'user', 'question_type', 'answer' ],\n
-// rows: \n   [ [ '2021-01-06', 'Dan', 'READING', 'NO' ],\n     [ '2021-01-17', 'Dan', 'DRINKING', 'NO' ],\n
-//  [ '2021-01-19', 'Dan', 'DRINKING', 'NO' ],\n
-// [ '2021-01-27', 'Dan', 'DRINKING', 'NO' ],\n
-// [ '2021-01-13', 'Dan', 'EXERCISE', 'NO' ],\n
-
-// TODO: needs finishing
-function calculateStreaks(user = Users.list()[0]) {
+function getStreaks(question_type: QuestionType, user: User) {
   const data = getDataBQIFStale(BQTableName.questionRead, user, 60);
-  console.log(data);
-}
+  const orderedQuestionData = data
+    .filter(function (r) {
+      return r.question_type === question_type;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.date_answered).valueOf() -
+        new Date(a.date_answered).valueOf()
+    );
 
-function getStreaks(question_type: QuestionType, user: User): any {
-  const data = getDataBQIFStale(BQTableName.summaryRead, user, 60);
+  let counter = 0;
+  const startEvents = orderedQuestionData
+    .map((d, i) => {
+      const previousDay = orderedQuestionData[i - 1];
+      d.isStreakStart = !!previousDay ? previousDay.answer != d.answer : true;
+      return d;
+    })
+    .map((d) => {
+      const increment = d.isStreakStart ? 1 : 0;
+      counter += increment;
+      d.streakCount = counter;
+      return d;
+    });
 
-  return data.find((r) => r.question_type === question_type);
+  const positiveReponse = user.questions.find((q) => q.type === question_type)
+    .positiveResponse;
+
+  const streakLength = startEvents.filter((i) => i.streakCount === 1).length;
+  const streakType = startEvents[0].answer === positiveReponse ? "good" : "bad";
+
+  return { streakType: streakType, streakLength: streakLength };
 }
 
 function createStreakMessage(
