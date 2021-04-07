@@ -8,7 +8,7 @@ function insertDataBQ(data: QuestionResponses, tableName: BQTableName): string {
         .join(", ")
     )
     .join("), (");
-  var query = `INSERT ${table.fullyQualifiedName} (${fields}) VALUES(${values});`;
+  var query = `INSERT INTO ${table.fullyQualifiedName} (${fields}) VALUES(${values});`;
   var request = {
     configuration: {
       query: {
